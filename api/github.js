@@ -167,12 +167,37 @@ async function fetchStreakData(username) {
       }
     }
 
+    // `recent` is contributions in reverse-chronological order (today first),
+    // so the *oldest* day of the current streak is at the END of this slice,
+    // not the start. The previous version had streakStart/streakEnd swapped,
+    // which produced an incorrect (reversed) date range on the card.
     let streakStart = null;
     let streakEnd = null;
     if (currentStreak > 0) {
       const dates = recent.filter((d) => d.count > 0).slice(0, currentStreak);
-      streakStart = dates[0]?.date;
-      streakEnd = dates[dates.length - 1]?.date;
+      streakStart = dates[dates.length - 1]?.date; // oldest day of the streak
+      streakEnd = dates[0]?.date; // most recent day of the streak (today)
+    }
+
+    // The longest streak previously had no date range of its own and just
+    // reused the current streak's range, which is wrong whenever the
+    // longest streak happened at a different time than the current one.
+    let longestStreakStart = null;
+    let longestStreakEnd = null;
+    let runStart = null;
+    tempStreak = 0;
+    for (const day of contributions) {
+      if (day.count > 0) {
+        if (tempStreak === 0) runStart = day.date;
+        tempStreak++;
+        if (tempStreak >= longestStreak) {
+          longestStreak = tempStreak;
+          longestStreakStart = runStart;
+          longestStreakEnd = day.date;
+        }
+      } else {
+        tempStreak = 0;
+      }
     }
 
     return {
@@ -181,6 +206,9 @@ async function fetchStreakData(username) {
       longestStreak,
       streakStart,
       streakEnd,
+      longestStreakStart,
+      longestStreakEnd,
+      contributionsSince: contributions[0]?.date || null,
     };
   } catch {
     return {
@@ -189,6 +217,9 @@ async function fetchStreakData(username) {
       longestStreak: 0,
       streakStart: null,
       streakEnd: null,
+      longestStreakStart: null,
+      longestStreakEnd: null,
+      contributionsSince: null,
     };
   }
 }
