@@ -247,13 +247,13 @@ const renderStatsCard = (stats, options = {}) => {
 
   return card.render(`
     ${rankCircle}
-    <svg x="0" y="0">
+    <g>
       ${flexLayout({
         items: statItems,
         gap: lheight,
         direction: "column",
       }).join("")}
-    </svg>
+    </g>
   `);
 };
 

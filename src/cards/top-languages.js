@@ -246,9 +246,9 @@ const renderTopLanguages = (topLangs, options = {}) => {
   }
 
   return card.render(`
-    <svg data-testid="lang-items" x="${CARD_PADDING}">
+    <g data-testid="lang-items" transform="translate(${CARD_PADDING}, 0)">
       ${finalLayout}
-    </svg>
+    </g>
   `);
 };
 
