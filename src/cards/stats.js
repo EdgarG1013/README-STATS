@@ -1,6 +1,6 @@
 import { Card } from "../common/Card.js";
 import { flexLayout, kFormatter, measureText, getCardColors } from "../common/utils.js";
-import { starIcon, commitIcon, prIcon, issuesIcon, discussionsIcon, reviewsIcon } from "../common/icons.js";
+import { starIcon, commitIcon, prIcon, issuesIcon, discussionsIcon, reviewsIcon, rankIcon } from "../common/icons.js";
 import { calculateRank } from "../calculateRank.js";
 import { I18n } from "../common/I18n.js";
 import { statCardLocales } from "../translations.js";

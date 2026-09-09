@@ -213,6 +213,7 @@ const fetchLanguages = async (username) => {
     }
   }
 
+  console.log("Languages found:", Object.keys(langMap).length);
   return langMap;
 };
 
