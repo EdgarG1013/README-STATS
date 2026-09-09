@@ -5,11 +5,20 @@ class I18n {
   }
 
   t(key, params = {}) {
-    let translation = this.translations[key] || key;
+    const keys = key.split(".");
+    let value = this.translations;
+    for (const k of keys) {
+      if (value && typeof value === "object" && k in value) {
+        value = value[k];
+      } else {
+        return key;
+      }
+    }
+    let result = typeof value === "string" ? value : key;
     Object.keys(params).forEach((paramKey) => {
-      translation = translation.replace(new RegExp(`{${paramKey}}`, "g"), params[paramKey]);
+      result = result.replace(new RegExp(`{${paramKey}}`, "g"), params[paramKey]);
     });
-    return translation;
+    return result;
   }
 }
 

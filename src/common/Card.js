@@ -99,6 +99,7 @@ class Card {
     </defs>
     <style>
       .card { font: 600 16px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${this.colors.textColor}; }
+      .card-bg { fill: ${this.colors.bgColor}; }
       .card a { text-decoration: none; }
       .header { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${this.colors.titleColor}; }
       .header::before { fill: ${this.colors.titleColor}; }
@@ -119,7 +120,7 @@ class Card {
       ${this.#css}
       ${this.animations || ""}
     </style>
-    <rect x="0.5" y="0.5" width="${this.width - 1}" height="${this.height - 1}" rx="${this.border_radius}" class="${this.cssClass()}" fill="${this.colors.bgColor}" stroke="${this.#hideBorder ? "none" : this.colors.borderColor || "none"}" stroke-width="1"/>
+    <rect x="0.5" y="0.5" width="${this.width - 1}" height="${this.height - 1}" rx="${this.border_radius}" class="card-border" fill="${this.colors.bgColor}" stroke="${this.#hideBorder ? "none" : this.colors.borderColor || "none"}" stroke-width="1"/>
     ${this.title ? this.renderTitle() : ""}
     <g transform="translate(0, ${this.title ? this.paddingY - 5 : this.paddingY})">
       ${body}
