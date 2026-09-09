@@ -154,7 +154,7 @@ const renderStatsCard = (stats, options = {}) => {
   STATS.stars = { icon: starIcon, label: i18n.t("statcard.totalstars"), value: totalStars, id: "stars" };
   STATS.commits = {
     icon: commitIcon,
-    label: `${i18n.t("statcard.commits")}${include_all_commits ? "" : ` (${new Date().getFullYear()})`}`,
+    label: `${i18n.t("statcard.commits")}${include_all_commits ? "" : " (last year)"}`,
     value: totalCommits,
     id: "commits",
   };
@@ -165,7 +165,7 @@ const renderStatsCard = (stats, options = {}) => {
     STATS.reviews = { icon: reviewsIcon, label: i18n.t("statcard.reviews"), value: totalReviews, id: "reviews" };
   }
 
-  STATS.contribs = { icon: starIcon, label: i18n.t("statcard.contribs"), value: contributedTo, id: "contribs" };
+  STATS.contribs = { icon: starIcon, label: `${i18n.t("statcard.contribs")}${include_all_commits ? "" : " (last year)"}`, value: contributedTo, id: "contribs" };
 
   const statItems = Object.keys(STATS)
     .filter((key) => !hide.includes(key))

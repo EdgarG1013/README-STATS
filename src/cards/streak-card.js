@@ -24,7 +24,7 @@ import { getCardColors } from "../common/utils.js";
  * @returns {string} SVG card markup
  */
 function renderStreakCard(username, streak, options = {}) {
-  const { textColor, bgColor, borderColor } = getCardColors({
+  const { titleColor, textColor, bgColor, borderColor } = getCardColors({
     title_color: options.title_color,
     text_color: options.text_color,
     bg_color: options.bg_color,
@@ -83,7 +83,7 @@ function renderStreakCard(username, streak, options = {}) {
           100% { font-size: 28px; opacity: 1; }
         }
         .header-fire { font: 600 20px 'Segoe UI', Ubuntu, Sans-Serif; fill: orange; filter: url(#glow); animation: glowPulse 2s infinite; }
-        .header-text { font: 600 20px 'Segoe UI', Ubuntu, Sans-Serif; fill: black; }
+        .header-text { font: 600 20px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${titleColor}; }
         .stat { font: 700 28px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${textColor}; text-anchor: middle; animation: fadein 0.6s forwards; }
         .label { font: 400 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${textColor}; text-anchor: middle; opacity: 0; animation: fadein 0.8s forwards; }
         .range { font: 400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${textColor}; text-anchor: middle; opacity: 0; animation: fadein 1s forwards; }

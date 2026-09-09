@@ -34,11 +34,11 @@ const getHeaders = (token) => ({
 
 // GraphQL query for stats
 const STATS_QUERY = `
-  query userInfo($login: String!) {
+  query userInfo($login: String!, $from: DateTime!, $to: DateTime!) {
     user(login: $login) {
       name
       login
-      contributionsCollection {
+      contributionsCollection(from: $from, to: $to) {
         contributionCalendar {
           totalContributions
         }
@@ -90,9 +90,9 @@ const LANGUAGES_QUERY = `
 `;
 
 const CONTRIBUTIONS_QUERY = `
-  query userInfo($login: String!) {
+  query userInfo($login: String!, $from: DateTime!, $to: DateTime!) {
     user(login: $login) {
-      contributionsCollection {
+      contributionsCollection(from: $from, to: $to) {
         contributionCalendar {
           totalContributions
           weeks {
@@ -146,7 +146,15 @@ const graphqlRequest = async (query, variables) => {
 };
 
 const fetchStats = async (username) => {
-  const data = await graphqlRequest(STATS_QUERY, { login: username });
+  const now = new Date();
+  const oneYearAgo = new Date(now);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  
+  const data = await graphqlRequest(STATS_QUERY, { 
+    login: username,
+    from: oneYearAgo.toISOString(),
+    to: now.toISOString(),
+  });
 
   if (!data.user) {
     throw new CustomError("User not found", "USER_NOT_FOUND");
@@ -218,7 +226,15 @@ const fetchLanguages = async (username) => {
 };
 
 const fetchContributions = async (username) => {
-  const data = await graphqlRequest(CONTRIBUTIONS_QUERY, { login: username });
+  const now = new Date();
+  const oneYearAgo = new Date(now);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  
+  const data = await graphqlRequest(CONTRIBUTIONS_QUERY, { 
+    login: username,
+    from: oneYearAgo.toISOString(),
+    to: now.toISOString(),
+  });
 
   if (!data.user) {
     throw new CustomError("User not found", "USER_NOT_FOUND");

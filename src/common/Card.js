@@ -17,7 +17,7 @@ class Card {
     titleSuffix = null,
     border_radius = 4.5,
     paddingX = 25,
-    paddingY = 35,
+    paddingY = 45,
     colors = {},
     animations,
     layout,

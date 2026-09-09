@@ -48,10 +48,7 @@ const rankIcon = (iconName = "default", level = "C", percentile = 50) => {
   };
   const color = levelColors[level] || "#2f80ed";
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="10" fill="none" stroke="${color}" stroke-width="2"/>
-      <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="bold" fill="${color}">${level}</text>
-    </svg>
+    <text x="-10" y="14" text-anchor="middle" font-size="24" font-weight="800" font-family="'Segoe UI', Ubuntu, Sans-Serif" fill="${color}">${level}</text>
   `;
 };
 const locationIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 16 16">${icons.location}</svg>`;
