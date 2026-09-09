@@ -1,0 +1,16 @@
+{
+  "name": "github-readme-stats",
+  "version": "1.0.0",
+  "description": "Genera tarjetas SVG personalizadas de estadísticas de GitHub para READMEs",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
