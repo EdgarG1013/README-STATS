@@ -74,20 +74,18 @@ const getStyles = ({ titleColor, textColor, iconColor, ringColor, show_icons, pr
   `;
 };
 
-const createTextNode = ({ icon, label, value, id, unitSymbol, index, showIcons, shiftValuePos, bold, number_format }) => {
+const createTextNode = ({ icon, label, value, id, unitSymbol, index, showIcons, shiftValuePos, bold, number_format, textColor }) => {
   const kValue = number_format === "long" ? value : kFormatter(value);
-  const staggerDelay = (index + 3) * 150;
   const labelOffset = showIcons ? `x="25"` : "";
   const iconSvg = showIcons
     ? `<svg data-testid="icon" class="icon" viewBox="0 0 16 16" version="1.1" width="16" height="16">${icon}</svg>`
     : "";
 
   return `
-    <g class="stagger" style="animation-delay: ${staggerDelay}ms" transform="translate(25, 0)">
+    <g transform="translate(25, 0)">
       ${iconSvg}
-      <text class="stat ${bold ? " bold" : "not_bold"}" ${labelOffset} y="12.5">${label}:</text>
-      <text
-        class="stat ${bold ? " bold" : "not_bold"}"
+      <text fill="${textColor}" font-size="14" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-weight="${bold ? 700 : 400}" ${labelOffset} y="12.5">${label}:</text>
+      <text fill="${textColor}" font-size="14" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-weight="${bold ? 700 : 400}"
         x="${(showIcons ? 140 : 120) + shiftValuePos}"
         y="12.5"
         data-testid="${id}"
@@ -183,6 +181,7 @@ const renderStatsCard = (stats, options = {}) => {
         shiftValuePos: 79.01,
         bold: text_bold,
         number_format,
+        textColor,
       }),
     );
 

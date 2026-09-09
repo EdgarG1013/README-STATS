@@ -38,27 +38,26 @@ const trimTopLanguages = (topLangs, langs_count, hide) => {
   return { langs, totalLanguageSize };
 };
 
-const createCompactLangNode = ({ lang, totalSize, hideProgress, index }) => {
+const createCompactLangNode = ({ lang, totalSize, hideProgress, index, textColor }) => {
   const percentage = ((lang.size / totalSize) * 100).toFixed(2);
-  const staggerDelay = (index + 3) * 150;
   const color = lang.color || "#858585";
 
   return `
-    <g class="stagger" style="animation-delay: ${staggerDelay}ms">
+    <g>
       <circle cx="5" cy="6" r="5" fill="${color}" />
-      <text data-testid="lang-name" x="15" y="10" class='lang-name'>
+      <text data-testid="lang-name" x="15" y="10" fill="${textColor}" font-size="11" font-family="'Segoe UI', Ubuntu, Sans-Serif">
         ${lang.name} ${hideProgress ? "" : percentage + "%"}
       </text>
     </g>
   `;
 };
 
-const createLanguageTextNode = ({ langs, totalSize, hideProgress }) => {
+const createLanguageTextNode = ({ langs, totalSize, hideProgress, textColor }) => {
   const longestLang = getLongestLang(langs);
   const chunked = chunkArray(langs, Math.ceil(langs.length / 2));
   const layouts = chunked.map((array) => {
     const items = array.map((lang, index) =>
-      createCompactLangNode({ lang, totalSize, hideProgress, index })
+      createCompactLangNode({ lang, totalSize, hideProgress, index, textColor })
     );
     return flexLayout({ items, gap: 25, direction: "column" }).join("");
   });
@@ -69,7 +68,7 @@ const createLanguageTextNode = ({ langs, totalSize, hideProgress }) => {
   return flexLayout({ items: layouts, gap: maxGap < minGap ? minGap : maxGap }).join("");
 };
 
-const renderCompactLayout = (langs, width, totalLanguageSize, hideProgress) => {
+const renderCompactLayout = (langs, width, totalLanguageSize, hideProgress, textColor) => {
   const paddingRight = 50;
   const offsetWidth = width - paddingRight;
   let progressOffset = 0;
@@ -108,24 +107,23 @@ const renderCompactLayout = (langs, width, totalLanguageSize, hideProgress) => {
     `
     }
     <g transform="translate(0, ${hideProgress ? "0" : "25"})">
-      ${createLanguageTextNode({ langs, totalSize: totalLanguageSize, hideProgress })}
+      ${createLanguageTextNode({ langs, totalSize: totalLanguageSize, hideProgress, textColor })}
     </g>
   `;
 };
 
-const renderNormalLayout = (langs, width, totalLanguageSize) => {
+const renderNormalLayout = (langs, width, totalLanguageSize, textColor) => {
   return flexLayout({
     items: langs.map((lang, index) => {
       const percentage = ((lang.size / totalLanguageSize) * 100).toFixed(2);
-      const staggerDelay = (index + 3) * 150;
       const paddingRight = 95;
       const progressTextX = width - paddingRight + 10;
       const progressWidth = width - paddingRight;
 
       return `
-        <g class="stagger" style="animation-delay: ${staggerDelay}ms">
-          <text data-testid="lang-name" x="2" y="15" class="lang-name">${lang.name}</text>
-          <text x="${progressTextX}" y="34" class="lang-name">${percentage}%</text>
+        <g>
+          <text data-testid="lang-name" x="2" y="15" fill="${textColor}" font-size="11" font-family="'Segoe UI', Ubuntu, Sans-Serif">${lang.name}</text>
+          <text x="${progressTextX}" y="34" fill="${textColor}" font-size="11" font-family="'Segoe UI', Ubuntu, Sans-Serif">${percentage}%</text>
           <rect
             x="0"
             y="25"
@@ -203,12 +201,12 @@ const renderTopLanguages = (topLangs, options = {}) => {
   let finalLayout = "";
   if (langs.length === 0) {
     height = COMPACT_LAYOUT_BASE_HEIGHT;
-    finalLayout = `<text x="0" y="11" class="stat bold" fill="${colors.textColor}">${i18n.t("langcard.nodata")}</text>`;
+    finalLayout = `<text x="0" y="11" fill="${colors.textColor}" font-size="14" font-weight="700" font-family="'Segoe UI', Ubuntu, Sans-Serif">${i18n.t("langcard.nodata")}</text>`;
   } else if (layout === "compact" || hide_progress === true) {
     height = calculateCompactLayoutHeight(langs.length) + (hide_progress ? -25 : 0);
-    finalLayout = renderCompactLayout(langs, width, totalLanguageSize, hide_progress);
+    finalLayout = renderCompactLayout(langs, width, totalLanguageSize, hide_progress, colors.textColor);
   } else {
-    finalLayout = renderNormalLayout(langs, width, totalLanguageSize);
+    finalLayout = renderNormalLayout(langs, width, totalLanguageSize, colors.textColor);
   }
 
   const card = new Card({
