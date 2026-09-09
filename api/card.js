@@ -45,9 +45,6 @@ const STATS_QUERY = `
         totalIssueContributions
         totalPullRequestContributions
         totalPullRequestReviewContributions
-        restrictedContributionCount
-        hasActivityInThePast
-        hasAnyLimitedActivity
       }
       login
       name
@@ -122,15 +119,23 @@ const CONTRIBUTIONS_QUERY = `
 `;
 
 const graphqlRequest = async (query, variables) => {
+  const token = getToken();
+  if (!token) {
+    throw new CustomError(
+      "GitHub token not found. Set GITHUB_TOKEN or PAT_1 environment variable.",
+      "NO_TOKENS",
+    );
+  }
+
   const maxRetries = Math.max(TOKENS.length, 1);
   let lastError;
 
   for (let i = 0; i < maxRetries; i++) {
-    const token = getToken();
+    const currentToken = TOKENS.length > 0 ? getToken() : token;
     try {
       const response = await fetch("https://api.github.com/graphql", {
         method: "POST",
-        headers: getHeaders(token),
+        headers: getHeaders(currentToken),
         body: JSON.stringify({ query, variables }),
       });
 

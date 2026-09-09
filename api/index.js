@@ -7,6 +7,7 @@ import { MissingParamError } from "../src/common/utils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.join(__dirname, "..");
 
 const app = express();
 
@@ -14,11 +15,11 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static frontend files
-app.use("/static", express.static(path.join(__dirname, "ui")));
+app.use("/static", express.static(path.join(ROOT_DIR, "ui")));
 
 // Serve frontend root
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "ui", "index.html"));
+  res.sendFile(path.join(ROOT_DIR, "ui", "index.html"));
 });
 
 // Themes endpoint

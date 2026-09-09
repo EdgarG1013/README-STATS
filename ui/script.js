@@ -73,8 +73,15 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>`;
 
       const response = await fetch(apiUrl);
+      const contentType = response.headers.get("content-type");
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        let errorMsg = `HTTP ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorData.secondaryMessage || errorMsg;
+        } catch {}
+        throw new Error(errorMsg);
       }
 
       const svg = await response.text();
@@ -86,9 +93,17 @@ document.addEventListener("DOMContentLoaded", () => {
       codeSection.style.display = "block";
       copyBtn.disabled = false;
     } catch (error) {
+      let message = "Error loading card. Please check the username and try again.";
+      if (error.message.includes("401") || error.message.includes("token")) {
+        message = "GitHub token not configured. Set GITHUB_TOKEN in .env file.";
+      } else if (error.message.includes("404") || error.message.includes("not found")) {
+        message = "User not found. Please check the username.";
+      } else if (error.message) {
+        message = error.message;
+      }
       previewContainer.innerHTML = `
         <div class="preview-placeholder" style="color: var(--error);">
-          Error loading card. Please check the username and try again.
+          ${message}
         </div>`;
       console.error(error);
     }
