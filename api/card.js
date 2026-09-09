@@ -55,15 +55,6 @@ const STATS_QUERY = `
           isFork
         }
       }
-      repositoriesWithContributedIssues(ownerAffiliations: OWNER, first: 1) {
-        totalCount
-      }
-      repositoriesWithContributedPullRequests(ownerAffiliations: OWNER, first: 1) {
-        totalCount
-      }
-      repositoriesWithContributedCommits(ownerAffiliations: OWNER, first: 1) {
-        totalCount
-      }
       followers {
         totalCount
       }
@@ -175,9 +166,7 @@ const fetchStats = async (username) => {
   const totalIssues = contributions.totalIssueContributions;
   const totalPRs = contributions.totalPullRequestContributions;
   const totalReviews = contributions.totalPullRequestReviewContributions;
-  const contributedTo = user.repositoriesWithContributedIssues.totalCount
-    + user.repositoriesWithContributedPullRequests.totalCount
-    + user.repositoriesWithContributedCommits.totalCount;
+  const contributedTo = calendar.totalContributions - totalCommits - totalIssues - totalPRs;
 
   const rank = calculateRank({
     totalCommits,
@@ -194,7 +183,7 @@ const fetchStats = async (username) => {
     totalIssues,
     totalPRs,
     totalReviews,
-    contributedTo,
+    contributedTo: Math.max(0, contributedTo),
     rank,
   };
 };
