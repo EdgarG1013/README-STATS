@@ -1,14 +1,16 @@
-// Overall rank (S / A+ / A / A- / B+ / B / C+ / C), the same idea GitHub
-// README stats cards use. Previously the ring just showed totalCommits
-// re-scaled against a fixed /500, which is why it displayed an unrelated
-// letter-shaped glyph for low commit counts instead of anything meaningful.
-// Now the ring explicitly shows a computed letter grade + fill percentage.
+const { getCardColors } = require('../themes');
+
 function calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contributedTo }) {
-  const COMMITS_MEDIAN = 1000, COMMITS_WEIGHT = 2;
-  const PRS_MEDIAN = 100, PRS_WEIGHT = 3;
-  const ISSUES_MEDIAN = 50, ISSUES_WEIGHT = 1;
-  const STARS_MEDIAN = 100, STARS_WEIGHT = 4;
-  const CONTRIB_MEDIAN = 5, CONTRIB_WEIGHT = 2;
+  const COMMITS_MEDIAN = 1000;
+  const COMMITS_WEIGHT = 2;
+  const PRS_MEDIAN = 50;
+  const PRS_WEIGHT = 3;
+  const ISSUES_MEDIAN = 25;
+  const ISSUES_WEIGHT = 1;
+  const STARS_MEDIAN = 50;
+  const STARS_WEIGHT = 4;
+  const CONTRIB_MEDIAN = 5;
+  const CONTRIB_WEIGHT = 2;
   const TOTAL_WEIGHT = COMMITS_WEIGHT + PRS_WEIGHT + ISSUES_WEIGHT + STARS_WEIGHT + CONTRIB_WEIGHT;
 
   const exponentialCdf = (x) => 1 - Math.pow(2, -x);
@@ -39,8 +41,25 @@ function calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contri
 
 function renderStatsCard(data, theme) {
   const { name, totalStars, totalCommits, totalPRs, totalIssues, contributedTo } = data;
-  const t = theme;
+
+  const colors = getCardColors({
+    title_color: theme.title_color,
+    text_color: theme.text_color,
+    icon_color: theme.icon_color,
+    bg_color: theme.bg_color,
+    border_color: theme.border_color,
+    ring_color: theme.ring_color,
+    theme: theme.themeName,
+  });
+
   const rank = calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contributedTo });
+
+  const width = 495;
+  const height = 220;
+  const paddingX = 25;
+  const paddingY = 35;
+  const lineH = 25;
+  const border_radius = 14;
 
   const rows = [
     ['Total Stars Earned:', totalStars],
@@ -49,39 +68,64 @@ function renderStatsCard(data, theme) {
     ['Total Issues:', totalIssues],
     ['Contributed to (last year):', contributedTo],
   ];
+
   const rowsSvg = rows
     .map(([label, value], i) => {
-      const y = 72 + i * 28;
-      return `<text x="28" y="${y}" fill="${t.statLabel}" font-size="14">${label}</text>
-  <text x="260" y="${y}" fill="${t.statValue}" font-size="14" font-weight="bold" text-anchor="end">${Number(value).toLocaleString()}</text>`;
+      const y = paddingY + 20 + (i + 1) * lineH;
+      return `
+      <g transform="translate(${paddingX}, 0)">
+        <text class="stat" y="${y}">${label}</text>
+        <text class="stat" x="235" y="${y}">${Number(value).toLocaleString()}</text>
+      </g>`;
     })
-    .join('\n  ');
+    .join('');
 
-  const width = 495;
-  const height = 220;
-  const ringR = 52;
-  const ringC = 2 * Math.PI * ringR;
+  const ringRadius = 40;
+  const circumference = 2 * Math.PI * ringRadius;
+  const ringOffset = circumference * (1 - rank.percentage);
+  const ringX = width - paddingX - ringRadius - 10;
+  const ringY = paddingY + 20 + (rows.length * lineH) / 2;
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Segoe+UI&amp;display=swap');
-      text { font-family: 'Segoe UI', Ubuntu, Helvetica, Arial, sans-serif; }
-    </style>
-  </defs>
+  const svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .header {
+      font: 600 18px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${colors.titleColor};
+    }
+    .stat {
+      font: 600 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${colors.textColor};
+    }
+    .rank-text {
+      font: 800 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${colors.textColor};
+    }
+    .rank-circle {
+      stroke: ${colors.ringColor};
+      stroke-dasharray: ${circumference};
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+    .rank-circle-rim {
+      stroke: ${colors.ringColor};
+      stroke-width: 6;
+      opacity: 0.2;
+    }
+  </style>
 
-  <rect width="${width}" height="${height}" rx="14" fill="${t.cardBg}" stroke="${t.border}" stroke-width="1"/>
+  <rect x="0.5" y="0.5" rx="${border_radius}" height="99%"
+    stroke="${colors.borderColor}" width="${width - 1}"
+    fill="${colors.bgColor}" />
 
-  <text x="28" y="38" fill="${t.titleColor}" font-size="18" font-weight="bold">${escapeXml(name)}'s GitHub Stats</text>
+  <text data-testid="card-title" x="${paddingX}" y="${paddingY}" class="header">${escapeXml(name)}'s GitHub Stats</text>
 
   ${rowsSvg}
 
-  <g transform="translate(400, 115)">
-    <circle cx="0" cy="0" r="${ringR}" fill="none" stroke="${t.ringBg}" stroke-width="9"/>
-    <circle cx="0" cy="0" r="${ringR}" fill="none" stroke="${t.ringFill}" stroke-width="9"
-      stroke-dasharray="${ringC}" stroke-dashoffset="${ringC * (1 - rank.percentage)}"
-      stroke-linecap="round" transform="rotate(-90)"/>
-    <text x="0" y="9" fill="${t.textColor}" font-size="28" font-weight="bold" text-anchor="middle">${rank.level}</text>
+  <g transform="translate(${ringX}, ${ringY})">
+    <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle-rim"/>
+    <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle"
+      stroke-dashoffset="${ringOffset}" transform="rotate(-90)"/>
+    <text data-testid="rank-text" x="0" y="8" class="rank-text" text-anchor="middle">${rank.level}</text>
   </g>
 </svg>`;
 
@@ -89,7 +133,7 @@ function renderStatsCard(data, theme) {
 }
 
 function escapeXml(str) {
-  return str
+  return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

@@ -1,57 +1,122 @@
 const GITHUB_API = 'https://api.github.com';
+const GITHUB_GRAPHQL_API = 'https://api.github.com/graphql';
 
 async function fetchGitHubData(username, token) {
-  const headers = {
+  const restHeaders = {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'github-readme-stats-app',
   };
-  if (token) headers['Authorization'] = `token ${token}`;
+  if (token) restHeaders['Authorization'] = `token ${token}`;
 
-  const [
-    userRes,
-    reposRes,
-    contributionsRes,
-  ] = await Promise.all([
-    fetch(`${GITHUB_API}/users/${username}`, { headers }),
-    fetch(`${GITHUB_API}/users/${username}/repos?per_page=100&sort=updated`, { headers }),
-    fetch(`https://github.com/${username}`, {
-      headers: { ...headers, Accept: 'text/html' },
-    }),
-  ]);
+  const gqlHeaders = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'github-readme-stats-app',
+  };
+  if (token) gqlHeaders['Authorization'] = `bearer ${token}`;
 
-  if (!userRes.ok) {
-    throw new Error(`GitHub user not found: ${username}`);
-  }
-
+  const userRes = await fetch(`${GITHUB_API}/users/${username}`, { headers: restHeaders });
+  if (!userRes.ok) throw new Error(`GitHub user not found: ${username}`);
   const user = await userRes.json();
-  const repos = await reposRes.json();
+
+  const gqlQuery = `query userInfo($login: String!) {
+    user(login: $login) {
+      name
+      login
+      avatarUrl
+      repositories(ownerAffiliations: OWNER, isFork: false, first: 100) {
+        nodes {
+          name
+          stargazerCount
+          languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+            edges {
+              size
+              node { color, name }
+            }
+          }
+        }
+      }
+      contributionsCollection {
+        totalCommitContributions
+        totalPullRequestReviewContributions
+      }
+      pullRequests {
+        totalCount
+      }
+      issues {
+        totalCount
+      }
+      repositoriesContributedTo(first: 1, contributionTypes: [PULL_REQUEST, ISSUE, REPOSITORY]) {
+        totalCount
+      }
+      followers {
+        totalCount
+      }
+    }
+  }`;
+
+  let gqlData = null;
+  try {
+    const gqlRes = await fetch(GITHUB_GRAPHQL_API, {
+      method: 'POST',
+      headers: gqlHeaders,
+      body: JSON.stringify({ query: gqlQuery, variables: { login: username } }),
+    });
+    if (gqlRes.ok) {
+      const gqlJson = await gqlRes.json();
+      gqlData = gqlJson.data?.user;
+    }
+  } catch {
+    // GraphQL may fail if no token, fall back to REST
+  }
 
   let totalStars = 0;
-  let totalForks = 0;
-  const langMap = {};
+  let totalCommits = 0;
+  let totalPRs = 0;
+  let totalIssues = 0;
+  let contributedTo = 0;
+  let langMap = {};
 
-  for (const repo of repos) {
-    totalStars += repo.stargazers_count || 0;
-    totalForks += repo.forks_count || 0;
-    if (repo.language) {
-      langMap[repo.language] = (langMap[repo.language] || 0) + 1;
+  if (gqlData) {
+    totalPRs = gqlData.pullRequests?.totalCount || 0;
+    totalIssues = gqlData.issues?.totalCount || 0;
+    contributedTo = gqlData.repositoriesContributedTo?.totalCount || 0;
+    totalCommits = gqlData.contributionsCollection?.totalCommitContributions || 0;
+
+    const repos = gqlData.repositories?.nodes || [];
+    for (const repo of repos) {
+      totalStars += repo.stargazerCount || 0;
+      for (const edge of repo.languages?.edges || []) {
+        const name = edge.node.name;
+        if (!langMap[name]) {
+          langMap[name] = { name, size: 0, color: edge.node.color };
+        }
+        langMap[name].size += edge.size;
+      }
     }
+  } else {
+    // Fallback: REST-only mode
+    const reposRes = await fetch(`${GITHUB_API}/users/${username}/repos?per_page=100&sort=updated`, { headers: restHeaders });
+    const repos = await reposRes.json();
+    for (const repo of repos) {
+      totalStars += repo.stargazers_count || 0;
+      if (repo.language) {
+        if (!langMap[repo.language]) {
+          langMap[repo.language] = { name: repo.language, size: 0, color: null };
+        }
+        langMap[repo.language].size += 1;
+      }
+    }
+    totalCommits = await fetchCommitCount(username, repos, restHeaders);
+    totalPRs = await fetchSearchCount(username, 'pr', restHeaders);
+    totalIssues = await fetchSearchCount(username, 'issue', restHeaders);
+    contributedTo = await fetchContributedTo(username, restHeaders);
   }
 
-  const languages = Object.entries(langMap)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
+  // Deduplicate languages and sort by size
+  const languages = Object.values(langMap)
+    .sort((a, b) => b.size - a.size)
     .slice(0, 6);
 
-  const totalLangCount = languages.reduce((s, l) => s + l.count, 0);
-  for (const lang of languages) {
-    lang.percentage = ((lang.count / totalLangCount) * 100).toFixed(2);
-  }
-
-  const totalCommits = await fetchCommitCount(username, repos, headers);
-  const totalPRs = await fetchPRCount(username, headers);
-  const totalIssues = await fetchIssueCount(username, headers);
-  const contributedTo = await fetchContributedTo(username, headers);
   const streakData = await fetchStreakData(username);
   const contributionDays = await fetchContributionDays(username);
 
@@ -60,7 +125,6 @@ async function fetchGitHubData(username, token) {
     login: user.login,
     avatarUrl: user.avatar_url,
     totalStars,
-    totalForks,
     totalCommits,
     totalPRs,
     totalIssues,
@@ -92,23 +156,10 @@ async function fetchCommitCount(username, repos, headers) {
   }
 }
 
-async function fetchPRCount(username, headers) {
+async function fetchSearchCount(username, type, headers) {
   try {
     const res = await fetch(
-      `${GITHUB_API}/search/issues?q=author:${username}+type:pr`,
-      { headers }
-    );
-    const data = await res.json();
-    return data.total_count || 0;
-  } catch {
-    return 0;
-  }
-}
-
-async function fetchIssueCount(username, headers) {
-  try {
-    const res = await fetch(
-      `${GITHUB_API}/search/issues?q=author:${username}+type:issue`,
+      `${GITHUB_API}/search/issues?q=author:${username}+type:${type}`,
       { headers }
     );
     const data = await res.json();
@@ -143,12 +194,12 @@ async function fetchStreakData(username) {
     let longestStreak = 0;
     let tempStreak = 0;
     let totalContributions = 0;
-    const today = new Date().toISOString().split('T')[0];
 
     for (const day of contributions) {
       totalContributions += day.count;
     }
 
+    // Current streak: count from today backwards
     const recent = [...contributions].reverse();
     for (const day of recent) {
       if (day.count > 0) {
@@ -158,30 +209,7 @@ async function fetchStreakData(username) {
       }
     }
 
-    for (const day of contributions) {
-      if (day.count > 0) {
-        tempStreak++;
-        longestStreak = Math.max(longestStreak, tempStreak);
-      } else {
-        tempStreak = 0;
-      }
-    }
-
-    // `recent` is contributions in reverse-chronological order (today first),
-    // so the *oldest* day of the current streak is at the END of this slice,
-    // not the start. The previous version had streakStart/streakEnd swapped,
-    // which produced an incorrect (reversed) date range on the card.
-    let streakStart = null;
-    let streakEnd = null;
-    if (currentStreak > 0) {
-      const dates = recent.filter((d) => d.count > 0).slice(0, currentStreak);
-      streakStart = dates[dates.length - 1]?.date; // oldest day of the streak
-      streakEnd = dates[0]?.date; // most recent day of the streak (today)
-    }
-
-    // The longest streak previously had no date range of its own and just
-    // reused the current streak's range, which is wrong whenever the
-    // longest streak happened at a different time than the current one.
+    // Longest streak: scan all contributions
     let longestStreakStart = null;
     let longestStreakEnd = null;
     let runStart = null;
@@ -198,6 +226,15 @@ async function fetchStreakData(username) {
       } else {
         tempStreak = 0;
       }
+    }
+
+    // Current streak date range
+    let streakStart = null;
+    let streakEnd = null;
+    if (currentStreak > 0) {
+      const streakDays = recent.filter((d) => d.count > 0).slice(0, currentStreak);
+      streakStart = streakDays[streakDays.length - 1]?.date;
+      streakEnd = streakDays[0]?.date;
     }
 
     return {

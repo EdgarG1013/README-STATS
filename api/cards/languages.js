@@ -1,3 +1,5 @@
+const { getCardColors } = require('../themes');
+
 const langColors = {
   TypeScript: '#3178c6',
   JavaScript: '#f1e05a',
@@ -19,65 +21,95 @@ const langColors = {
   Scala: '#c22d40',
   R: '#198CE7',
   Lua: '#000080',
+  Svelte: '#ff3e00',
+  Astro: '#ff5a03',
+  'Jupyter Notebook': '#DA5B0B',
 };
 
-const barColors = [
+const defaultBarColors = [
   '#3178c6', '#f1e05a', '#3572A5', '#b07219', '#e34c26',
   '#563d7c', '#89e051', '#00ADD8', '#dea584', '#41b883',
 ];
 
 function renderLanguagesCard(languages, theme) {
-  const t = theme;
-  const cardWidth = 495;
-  const cardHeight = 170;
-  const barHeight = 18;
-  const barWidth = cardWidth - 56;
-  const startX = 28;
-  const startY = 60;
+  const colors = getCardColors({
+    title_color: theme.title_color,
+    text_color: theme.text_color,
+    icon_color: theme.icon_color,
+    bg_color: theme.bg_color,
+    border_color: theme.border_color,
+    theme: theme.themeName,
+  });
 
-  const total = languages.reduce((s, l) => s + parseFloat(l.percentage), 0);
-  let barX = 0;
+  const width = 495;
+  const height = 180;
+  const border_radius = 14;
+  const paddingX = 25;
+  const paddingY = 35;
+
+  const barHeight = 14;
+  const barWidth = width - paddingX * 2;
+  const barY = paddingY + 12;
+  const barRadius = 7;
+
+  const total = languages.reduce((s, l) => s + l.size, 0);
 
   let barSegments = '';
+  let offsetX = 0;
+
   for (let i = 0; i < languages.length; i++) {
     const lang = languages[i];
-    const segWidth = (parseFloat(lang.percentage) / total) * barWidth;
-    const color = langColors[lang.name] || barColors[i % barColors.length];
-    barSegments += `<rect x="${startX + barX}" y="${startY}" width="${Math.max(segWidth, 2)}" height="${barHeight}" fill="${color}" rx="${i === 0 ? '4' : '0'}" ry="${i === 0 ? '4' : '0'}"/>`;
-    barX += segWidth;
+    const segWidth = (lang.size / total) * barWidth;
+    const color = langColors[lang.name] || lang.color || defaultBarColors[i % defaultBarColors.length];
+    barSegments += `<rect x="${paddingX + offsetX}" y="${barY}" width="${Math.max(segWidth, 3)}" height="${barHeight}" fill="${color}"/>`;
+    offsetX += segWidth;
   }
+
+  // Mask for rounded bar
+  const barMask = `
+  <mask id="barMask">
+    <rect x="${paddingX}" y="${barY}" width="${barWidth}" height="${barHeight}" rx="${barRadius}" ry="${barRadius}" fill="white"/>
+  </mask>`;
 
   let legendItems = '';
   const cols = 2;
-  const colWidth = cardWidth / cols;
+  const colWidth = (width - paddingX * 2) / cols;
+  const legendStartY = barY + barHeight + 22;
+
   for (let i = 0; i < languages.length; i++) {
     const lang = languages[i];
     const col = i % cols;
     const row = Math.floor(i / cols);
-    const lx = startX + col * colWidth;
-    const ly = startY + barHeight + 30 + row * 26;
-    const color = langColors[lang.name] || barColors[i % barColors.length];
+    const lx = paddingX + col * colWidth;
+    const ly = legendStartY + row * 24;
+    const color = langColors[lang.name] || lang.color || defaultBarColors[i % defaultBarColors.length];
+    const pct = ((lang.size / total) * 100).toFixed(2);
 
-    legendItems += `<circle cx="${lx + 5}" cy="${ly - 4}" r="5" fill="${color}"/>
-    <text x="${lx + 18}" y="${ly}" fill="${t.textColor}" font-size="12">${lang.name} ${lang.percentage}%</text>`;
+    legendItems += `
+    <circle cx="${lx + 5}" cy="${ly - 4}" r="5" fill="${color}"/>
+    <text data-testid="lang-name" x="${lx + 18}" y="${ly}" class="lang-name">${lang.name} ${pct}%</text>`;
   }
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cardWidth}" height="${cardHeight}" viewBox="0 0 ${cardWidth} ${cardHeight}">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Segoe+UI&amp;display=swap');
-      text { font-family: 'Segoe UI', Ubuntu, Helvetica, Arial, sans-serif; }
-    </style>
-  </defs>
+  const svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .header {
+      font: 600 18px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${colors.titleColor};
+    }
+    .lang-name {
+      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: ${colors.textColor};
+    }
+  </style>
 
-  <rect width="${cardWidth}" height="${cardHeight}" rx="12" fill="${t.cardBg}" stroke="${t.border}" stroke-width="1"/>
+  <rect x="0.5" y="0.5" rx="${border_radius}" height="99%"
+    stroke="${colors.borderColor}" width="${width - 1}"
+    fill="${colors.bgColor}" />
 
-  <text x="28" y="38" fill="${t.titleColor}" font-size="18" font-weight="bold">Most Used Languages</text>
+  <text data-testid="card-title" x="${paddingX}" y="${paddingY}" class="header">Most Used Languages</text>
 
-  <clipPath id="barClip">
-    <rect x="${startX}" y="${startY}" width="${barWidth}" height="${barHeight}" rx="4" ry="4"/>
-  </clipPath>
-  <g clip-path="url(#barClip)">
+  ${barMask}
+  <g mask="url(#barMask)">
     ${barSegments}
   </g>
 
