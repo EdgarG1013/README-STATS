@@ -1,187 +1,226 @@
-const express = require('express');
-const { fetchGitHubData } = require('./github');
-const { renderStatsCard } = require('./cards/stats');
-const { renderLanguagesCard } = require('./cards/languages');
-const { renderStreakCard } = require('./cards/streak');
-const { renderContributionsCard } = require('./cards/contributions');
-const { themes, getCardColors } = require('./themes');
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { renderStats, renderLanguages, renderStreak, fetchContributions, themes } from "./card.js";
+import { MissingParamError } from "../src/common/utils.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
-const CACHE_HEADERS = 'max-age=0, no-cache, no-store, must-revalidate';
+app.use(cors());
+app.use(express.json());
 
-app.get('/api', async (req, res) => {
+// Serve static frontend files
+app.use("/static", express.static(path.join(__dirname, "ui")));
+
+// Serve frontend root
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "ui", "index.html"));
+});
+
+// Themes endpoint
+app.get("/api/themes", (req, res) => {
+  res.json({ themes: Object.keys(themes), details: themes });
+});
+
+// Stats card endpoint
+app.get("/api/card/stats", async (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ error: "Missing username parameter" });
+  }
+
   try {
-    const username = req.query.username;
-    const themeName = req.query.theme || 'default';
-    const card = req.query.card || 'all';
-    const token = process.env.GITHUB_TOKEN || null;
-
-    if (!username) {
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(400).json({
-        error: 'Missing required query parameter: username',
-        usage: '/api?username=YOUR_USERNAME&theme=default&card=all',
-        available_themes: Object.keys(themes),
-        available_cards: ['stats', 'languages', 'streak', 'contributions', 'all'],
-      });
-    }
-
-    const selectedTheme = themes[themeName] || themes["default"];
-    const themeConfig = { ...selectedTheme, themeName };
-
-    const data = await fetchGitHubData(username, token);
-
-    let svg;
-    switch (card) {
-      case 'stats':
-        svg = renderStatsCard(data, themeConfig);
-        break;
-      case 'languages':
-        svg = renderLanguagesCard(data.languages, themeConfig);
-        break;
-      case 'streak':
-        svg = renderStreakCard(data.streakData, themeConfig);
-        break;
-      case 'contributions':
-        svg = renderContributionsCard(username, data.contributionDays, themeConfig);
-        break;
-      default:
-        svg = renderCombinedCard(data, username, themeConfig);
-        break;
-    }
-
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', CACHE_HEADERS);
-    return res.status(200).send(svg);
-  } catch (err) {
-    const errorSvg = `<svg width="495" height="120" viewBox="0 0 495 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .err-title { font: 600 16px 'Segoe UI', Ubuntu, sans-serif; fill: #e06c75; }
-    .err-msg { font: 400 12px 'Segoe UI', Ubuntu, sans-serif; fill: #8b949e; }
-  </style>
-  <rect x="0.5" y="0.5" rx="14" height="99%" stroke="#e4e2e2" width="494" fill="#fffefe"/>
-  <text x="247" y="45" class="err-title" text-anchor="middle">Error</text>
-  <text x="247" y="72" class="err-msg" text-anchor="middle">${escapeXml(err.message)}</text>
-  <text x="247" y="100" class="err-msg" text-anchor="middle">Usage: ?username=YOUR_GITHUB_USERNAME</text>
-</svg>`;
-
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', CACHE_HEADERS);
-    return res.status(400).send(errorSvg);
+    const svg = await renderStats(username, req.query);
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+    res.send(svg);
+  } catch (error) {
+    console.error("Stats card error:", error);
+    res.status(error instanceof MissingParamError ? 400 : 500).json({
+      error: error.message,
+      secondaryMessage: error.secondaryMessage,
+    });
   }
 });
 
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.json({
-    name: 'GitHub README Stats API',
-    version: '1.0.0',
-    endpoints: {
-      stats: '/api?username=USERNAME&theme=default&card=stats',
-      languages: '/api?username=USERNAME&theme=default&card=languages',
-      streak: '/api?username=USERNAME&theme=default&card=streak',
-      contributions: '/api?username=USERNAME&theme=default&card=contributions',
-      all: '/api?username=USERNAME&theme=default&card=all',
-    },
-    themes: Object.keys(themes),
-  });
+// Languages card endpoint
+app.get("/api/card/languages", async (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ error: "Missing username parameter" });
+  }
+
+  try {
+    const svg = await renderLanguages(username, req.query);
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+    res.send(svg);
+  } catch (error) {
+    console.error("Languages card error:", error);
+    res.status(500).json({
+      error: error.message,
+      secondaryMessage: error.secondaryMessage,
+    });
+  }
 });
 
-function renderCombinedCard(data, username, themeConfig) {
-  const statsSvg = renderStatsCard(data, themeConfig);
-  const langSvg = renderLanguagesCard(data.languages, themeConfig);
-  const streakSvg = renderStreakCard(data.streakData, themeConfig);
-  const contribSvg = renderContributionsCard(username, data.contributionDays, themeConfig);
+// Streak card endpoint
+app.get("/api/card/streak", async (req, res) => {
+  const { username } = req.query;
 
-  const stripSvg = (svg) => {
-    return svg
-      .replace(/<svg[^>]*>/, '')
-      .replace(/<\/svg>/, '');
-  };
+  if (!username) {
+    return res.status(400).json({ error: "Missing username parameter" });
+  }
 
-  const gap = 15;
-  const totalHeight = 220 + gap + 180 + gap + 195 + gap + 240;
+  try {
+    const svg = await renderStreak(username, req.query);
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+    res.send(svg);
+  } catch (error) {
+    console.error("Streak card error:", error);
+    res.status(500).json({
+      error: error.message,
+      secondaryMessage: error.secondaryMessage,
+    });
+  }
+});
 
-  const colors = getCardColors({
-    title_color: themeConfig.title_color,
-    text_color: themeConfig.text_color,
-    icon_color: themeConfig.icon_color,
-    bg_color: themeConfig.bg_color,
-    border_color: themeConfig.border_color,
-    theme: themeConfig.themeName,
+// Contributions graph endpoint
+app.get("/api/card/contributions", async (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ error: "Missing username parameter" });
+  }
+
+  try {
+    const contributions = await fetchContributions(username);
+    const svg = renderContributionsGraph(contributions, req.query);
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+    res.send(svg);
+  } catch (error) {
+    console.error("Contributions card error:", error);
+    res.status(500).json({
+      error: error.message,
+      secondaryMessage: error.secondaryMessage,
+    });
+  }
+});
+
+// Render contributions graph
+function renderContributionsGraph(data, options = {}) {
+  const {
+    theme = "dark",
+    title_color,
+    text_color,
+    bg_color,
+    border_color,
+    hide_border = false,
+    custom_title = "Contribution Activity",
+  } = options;
+
+  const defaultTheme = themes[theme] || themes.default;
+
+  const titleColor = title_color || defaultTheme.title_color;
+  const textColor = text_color || defaultTheme.text_color;
+  const bgColor = bg_color || defaultTheme.bg_color;
+  const borderColor = border_color || defaultTheme.border_color;
+
+  const weeks = data.weeks || [];
+  const allDays = weeks.flatMap((week) => week.contributionDays);
+  const maxContributions = Math.max(...allDays.map((d) => d.contributionCount), 1);
+
+  const width = 722;
+  const height = 120;
+  const padding = { top: 20, right: 20, bottom: 20, left: 20 };
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+
+  // Create the contribution bars
+  let bars = "";
+  const totalDays = allDays.length;
+  const barWidth = chartWidth / totalDays;
+
+  allDays.forEach((day, i) => {
+    const barHeight = Math.max((day.contributionCount / maxContributions) * chartHeight, 1);
+    const x = padding.left + i * barWidth;
+    const y = padding.top + (chartHeight - barHeight);
+    const opacity = day.contributionCount === 0 ? 0.1 : Math.max(0.3, day.contributionCount / maxContributions);
+
+    bars += `<rect x="${x}" y="${y}" width="${Math.max(barWidth - 1, 1)}" height="${barHeight}" rx="1" fill="#${textColor}" opacity="${opacity}">
+      <title>${day.date}: ${day.contributionCount} contributions</title>
+    </rect>`;
   });
 
-  return `<svg width="495" height="${totalHeight}" viewBox="0 0 495 ${totalHeight}" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .header {
-      font: 600 18px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.titleColor};
-    }
-    .stat {
-      font: 600 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.textColor};
-    }
-    .rank-text {
-      font: 800 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.textColor};
-    }
-    .rank-circle {
-      stroke: ${colors.ringColor};
-      stroke-width: 6;
-      stroke-linecap: round;
-    }
-    .rank-circle-rim {
-      stroke: ${colors.ringColor};
-      stroke-width: 6;
-      opacity: 0.2;
-    }
-    .lang-name {
-      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.textColor};
-    }
-    .stat-big {
-      font: 800 32px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.titleColor};
-    }
-    .stat-label {
-      font: 600 12px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.titleColor};
-    }
-    .stat-date {
-      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.textColor};
-    }
-    .axis-label {
-      font: 400 10px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.textColor};
-    }
-  </style>
-
-  <rect x="0.5" y="0.5" rx="14" height="99%" stroke="${colors.borderColor}" width="494" fill="${colors.bgColor}"/>
-
-  <g transform="translate(0, 0)">
-    ${stripSvg(statsSvg)}
-  </g>
-  <g transform="translate(0, ${220 + gap})">
-    ${stripSvg(langSvg)}
-  </g>
-  <g transform="translate(0, ${220 + gap + 180 + gap})">
-    ${stripSvg(streakSvg)}
-  </g>
-  <g transform="translate(0, ${220 + gap + 180 + gap + 195 + gap})">
-    ${stripSvg(contribSvg)}
-  </g>
-</svg>`;
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      <style>
+        .title { font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #${titleColor}; }
+        .text { font: 400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #${textColor}; }
+      </style>
+      
+      <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="4.5" fill="#${bgColor}" stroke="${hide_border ? "none" : `#${borderColor}`}"/>
+      
+      <text x="15" y="16" class="title">${custom_title}</text>
+      
+      ${bars}
+    </svg>
+  `;
 }
 
-function escapeXml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
+// All cards endpoint
+app.get("/api/card/all", async (req, res) => {
+  const { username } = req.query;
 
-module.exports = app;
+  if (!username) {
+    return res.status(400).json({ error: "Missing username parameter" });
+  }
+
+  try {
+    const [statsSvg, langsSvg, streakSvg] = await Promise.all([
+      renderStats(username, req.query),
+      renderLanguages(username, req.query),
+      renderStreak(username, req.query),
+    ]);
+
+    const combined = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="495" height="500" viewBox="0 0 495 500">
+        <foreignObject x="0" y="0" width="495" height="170">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            ${statsSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}
+          </div>
+        </foreignObject>
+        <foreignObject x="0" y="180" width="495" height="100">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            ${langsSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}
+          </div>
+        </foreignObject>
+        <foreignObject x="0" y="290" width="495" height="195">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            ${streakSvg.replace(/<svg[^>]*>/, "").replace("</svg>", "")}
+          </div>
+        </foreignObject>
+      </svg>
+    `;
+
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+    res.send(combined);
+  } catch (error) {
+    console.error("Combined card error:", error);
+    res.status(500).json({
+      error: error.message,
+      secondaryMessage: error.secondaryMessage,
+    });
+  }
+});
+
+export default app;

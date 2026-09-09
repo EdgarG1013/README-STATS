@@ -1,14 +1,21 @@
 {
-  "name": "github-readme-stats",
+  "name": "github-readme-stats-custom",
   "version": "1.0.0",
-  "description": "Genera tarjetas SVG personalizadas de estadísticas de GitHub para READMEs",
-  "main": "api/index.js",
+  "type": "module",
+  "description": "GitHub README Stats - Genera tarjetas SVG personalizadas de estadísticas de GitHub",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node api/index.js",
-    "dev": "vercel dev"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "axios": "^1.7.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "emoji-name-map": "^2.0.3",
+    "express": "^4.21.0",
+    "github-username-regex": "^1.0.0",
+    "word-wrap": "^1.2.5"
   },
   "engines": {
     "node": ">=18.0.0"

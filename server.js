@@ -1,17 +1,14 @@
-const http = require('http');
-const app = require('./api/index');
+import app from "./api/index.js";
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-const server = http.createServer(app);
-
-server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Test URLs:`);
-  console.log(`  Root:        http://localhost:${PORT}/`);
-  console.log(`  Stats:       http://localhost:${PORT}/api?username=edgar&card=stats&theme=dark`);
-  console.log(`  Languages:   http://localhost:${PORT}/api?username=edgar&card=languages&theme=dark`);
-  console.log(`  Streak:      http://localhost:${PORT}/api?username=edgar&card=streak&theme=dark`);
-  console.log(`  Contribs:    http://localhost:${PORT}/api?username=edgar&card=contributions&theme=dark`);
-  console.log(`  All:         http://localhost:${PORT}/api?username=edgar&card=all&theme=dark`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Frontend available at http://localhost:${PORT}/`);
+  console.log(`API endpoints:`);
+  console.log(`  GET /api/card/stats?username=<username>&theme=<theme>`);
+  console.log(`  GET /api/card/languages?username=<username>&theme=<theme>`);
+  console.log(`  GET /api/card/streak?username=<username>&theme=<theme>`);
+  console.log(`  GET /api/card/contributions?username=<username>&theme=<theme>`);
+  console.log(`  GET /api/card/all?username=<username>&theme=<theme>`);
 });
