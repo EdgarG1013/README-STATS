@@ -34,54 +34,52 @@ const getHeaders = (token) => ({
 
 // GraphQL query for stats
 const STATS_QUERY = `
-  query contributionCalendar($username: String!) {
-    user(login: $username) {
+  query userInfo($login: String!) {
+    user(login: $login) {
+      name
+      login
       contributionsCollection {
         contributionCalendar {
           totalContributions
         }
         restrictedContributionsCount
         totalCommitContributions
-        totalIssueContributions
-        totalPullRequestContributions
         totalPullRequestReviewContributions
       }
-      login
-      name
-      repositories(ownerAffiliations: OWNER) {
+      repositoriesContributedTo(first: 1, contributionTypes: [COMMIT, ISSUE, PULL_REQUEST, REPOSITORY]) {
+        totalCount
+      }
+      pullRequests(first: 1) {
+        totalCount
+      }
+      openIssues: issues(states: OPEN) {
+        totalCount
+      }
+      closedIssues: issues(states: CLOSED) {
+        totalCount
+      }
+      repositories(ownerAffiliations: OWNER, isFork: false, first: 100) {
         totalCount
         nodes {
           stargazerCount
-          isFork
         }
       }
-      followers {
-        totalCount
-      }
-      stargazerCount
     }
   }
 `;
 
 const LANGUAGES_QUERY = `
-  query languages($username: String!) {
-    user(login: $username) {
-      repositories(ownerAffiliations: OWNER, first: 100) {
+  query userInfo($login: String!) {
+    user(login: $login) {
+      repositories(ownerAffiliations: OWNER, isFork: false, first: 100) {
         nodes {
           name
-          isFork
-          object(expression: "HEAD") {
-            ... on Commit {
-              tree {
-                languages(orderBy: SIZE, first: 1) {
-                  edges {
-                    size
-                    node {
-                      name
-                      color
-                    }
-                  }
-                }
+          languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+            edges {
+              size
+              node {
+                color
+                name
               }
             }
           }
@@ -92,8 +90,8 @@ const LANGUAGES_QUERY = `
 `;
 
 const CONTRIBUTIONS_QUERY = `
-  query contributionCalendar($username: String!) {
-    user(login: $username) {
+  query userInfo($login: String!) {
+    user(login: $login) {
       contributionsCollection {
         contributionCalendar {
           totalContributions
@@ -148,7 +146,7 @@ const graphqlRequest = async (query, variables) => {
 };
 
 const fetchStats = async (username) => {
-  const data = await graphqlRequest(STATS_QUERY, { username });
+  const data = await graphqlRequest(STATS_QUERY, { login: username });
 
   if (!data.user) {
     throw new CustomError("User not found", "USER_NOT_FOUND");
@@ -159,14 +157,14 @@ const fetchStats = async (username) => {
   const calendar = contributions.contributionCalendar;
 
   const totalStars = user.repositories.nodes.reduce((acc, repo) => {
-    return acc + (repo.isFork ? 0 : repo.stargazerCount);
+    return acc + repo.stargazerCount;
   }, 0);
 
   const totalCommits = contributions.totalCommitContributions;
-  const totalIssues = contributions.totalIssueContributions;
-  const totalPRs = contributions.totalPullRequestContributions;
+  const totalIssues = user.openIssues.totalCount + user.closedIssues.totalCount;
+  const totalPRs = user.pullRequests.totalCount;
   const totalReviews = contributions.totalPullRequestReviewContributions;
-  const contributedTo = calendar.totalContributions - totalCommits - totalIssues - totalPRs;
+  const contributedTo = user.repositoriesContributedTo.totalCount;
 
   const rank = calculateRank({
     totalCommits,
@@ -183,24 +181,24 @@ const fetchStats = async (username) => {
     totalIssues,
     totalPRs,
     totalReviews,
-    contributedTo: Math.max(0, contributedTo),
+    contributedTo,
     rank,
   };
 };
 
 const fetchLanguages = async (username) => {
-  const data = await graphqlRequest(LANGUAGES_QUERY, { username });
+  const data = await graphqlRequest(LANGUAGES_QUERY, { login: username });
 
   if (!data.user) {
     throw new CustomError("User not found", "USER_NOT_FOUND");
   }
 
-  const repos = data.user.repositories.nodes.filter((repo) => !repo.isFork);
+  const repos = data.user.repositories.nodes;
   const langMap = {};
 
   for (const repo of repos) {
-    if (repo.object?.tree?.languages?.edges) {
-      for (const edge of repo.object.tree.languages.edges) {
+    if (repo.languages?.edges) {
+      for (const edge of repo.languages.edges) {
         const lang = edge.node;
         if (langMap[lang.name]) {
           langMap[lang.name].size += edge.size;
@@ -219,7 +217,7 @@ const fetchLanguages = async (username) => {
 };
 
 const fetchContributions = async (username) => {
-  const data = await graphqlRequest(CONTRIBUTIONS_QUERY, { username });
+  const data = await graphqlRequest(CONTRIBUTIONS_QUERY, { login: username });
 
   if (!data.user) {
     throw new CustomError("User not found", "USER_NOT_FOUND");
