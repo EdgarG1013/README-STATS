@@ -26,7 +26,7 @@ const calculateRank = ({
   const INT_WIDTH = INT_R - INT_L;
   const INT_REVERSE = true;
 
-  const MAXPRECATED_SCORE = 20;
+  const MAX_DEPRECATED_SCORE = 20;
 
   const MULTIPLIERS = {
     contributions: 1,

@@ -288,7 +288,7 @@ const renderStreak = async (username, query) => {
 };
 
 const fetchStreakData = async (username) => {
-  const data = await graphqlRequest(CONTRIBUTIONS_QUERY, { username });
+  const data = await graphqlRequest(CONTRIBUTIONS_QUERY, { login: username });
 
   if (!data.user) {
     throw new CustomError("User not found", "USER_NOT_FOUND");

@@ -13,7 +13,6 @@ class Card {
     height = null,
     customTitle = "",
     defaultTitle = "",
-    title = null,
     titlePrefix = null,
     titleSuffix = null,
     border_radius = 4.5,
@@ -25,7 +24,6 @@ class Card {
   }) {
     this.width = width;
     this.height = height;
-    this.title = title;
     this.titlePrefix = titlePrefix;
     this.titleSuffix = titleSuffix;
     this.border_radius = border_radius;
