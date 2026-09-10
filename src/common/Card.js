@@ -117,6 +117,10 @@ class Card {
         from { transform: scale(0); }
         to { transform: scale(1); }
       }
+      @keyframes rankFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
       ${this.#css}
       ${this.animations || ""}
     </style>

@@ -45,7 +45,8 @@ const getStyles = ({ titleColor, textColor, iconColor, ringColor, show_icons, pr
     }
     .rank-text {
       font: 800 24px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${textColor};
-      animation: scaleInAnimation 0.3s ease-in-out forwards;
+      opacity: 0;
+      animation: rankFadeIn 0.3s ease-in-out forwards;
     }
     .not_bold { font-weight: 400 }
     .bold { font-weight: 700 }
