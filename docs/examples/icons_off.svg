@@ -1,0 +1,66 @@
+<svg width="495" height="220" viewBox="0 0 495 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .header {
+      font: 600 18px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #ff6e96;
+    }
+    .stat {
+      font: 700 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #f8f8f2;
+    }
+    .rank-text {
+      font: 800 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #f8f8f2;
+    }
+    .rank-circle {
+      stroke: #ff6e96;
+      stroke-dasharray: 251.32741228718345;
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+    .rank-circle-rim {
+      stroke: #ff6e96;
+      stroke-width: 6;
+      opacity: 0.2;
+    }
+  </style>
+
+  <rect x="0" y="0" rx="14" width="495" height="220"
+    fill="#282a36" stroke="#6272a4" stroke-width="1" />
+
+  <text data-testid="card-title" x="25" y="35" class="header">Edgar Garcia's GitHub Stats</text>
+
+  
+      <g transform="translate(25, 0)">
+        
+        <text class="stat" x="0" y="80">Total Stars Earned:</text>
+        <text class="stat" x="255" y="80">0</text>
+      </g>
+      <g transform="translate(25, 0)">
+        
+        <text class="stat" x="0" y="105">Total Commits (last year):</text>
+        <text class="stat" x="255" y="105">153</text>
+      </g>
+      <g transform="translate(25, 0)">
+        
+        <text class="stat" x="0" y="130">Total PRs:</text>
+        <text class="stat" x="255" y="130">10</text>
+      </g>
+      <g transform="translate(25, 0)">
+        
+        <text class="stat" x="0" y="155">Total Issues:</text>
+        <text class="stat" x="255" y="155">0</text>
+      </g>
+      <g transform="translate(25, 0)">
+        
+        <text class="stat" x="0" y="180">Contributed to (last year):</text>
+        <text class="stat" x="255" y="180">2</text>
+      </g>
+
+  <g transform="translate(420, 117.5)">
+    <circle cx="0" cy="0" r="40" fill="none" class="rank-circle-rim"/>
+    <circle cx="0" cy="0" r="40" fill="none" class="rank-circle"
+      stroke-dashoffset="228.83622438262526" transform="rotate(-90)"/>
+    <text data-testid="rank-text" x="0" y="8" class="rank-text" text-anchor="middle">C</text>
+  </g>
+</svg>

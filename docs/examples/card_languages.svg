@@ -1,0 +1,37 @@
+<svg width="495" height="194" viewBox="0 0 495 194" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .header {
+      font: 600 18px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #ff6e96;
+    }
+    .lang-name {
+      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #f8f8f2;
+    }
+  </style>
+
+  <rect x="0" y="0" rx="14" width="495" height="194"
+    fill="#282a36" stroke="#6272a4" stroke-width="1" />
+
+  <text data-testid="card-title" x="25" y="35" class="header">Most Used Languages</text>
+
+  
+  <mask id="barMask">
+    <rect x="25" y="61" width="445" height="14" rx="7" ry="7" fill="white"/>
+  </mask>
+  <g mask="url(#barMask)">
+    <rect x="25" y="61" width="397.9142914291429" height="14" fill="#3178c6"/><rect x="422.9142914291429" y="61" width="20.65006500650065" height="14" fill="#b07219"/><rect x="443.56435643564356" y="61" width="17.045204520452046" height="14" fill="#f1e05a"/><rect x="460.6095609560956" y="61" width="7.788278827882788" height="14" fill="#563d7c"/><rect x="468.3978397839784" y="61" width="3" height="14" fill="#e34c26"/>
+  </g>
+
+  
+    <circle cx="30" cy="93" r="5" fill="#3178c6"/>
+    <text data-testid="lang-name" x="43" y="97" class="lang-name">TypeScript 89.42%</text>
+    <circle cx="252.5" cy="93" r="5" fill="#b07219"/>
+    <text data-testid="lang-name" x="265.5" y="97" class="lang-name">Java 4.64%</text>
+    <circle cx="30" cy="117" r="5" fill="#f1e05a"/>
+    <text data-testid="lang-name" x="43" y="121" class="lang-name">JavaScript 3.83%</text>
+    <circle cx="252.5" cy="117" r="5" fill="#563d7c"/>
+    <text data-testid="lang-name" x="265.5" y="121" class="lang-name">CSS 1.75%</text>
+    <circle cx="30" cy="141" r="5" fill="#e34c26"/>
+    <text data-testid="lang-name" x="43" y="145" class="lang-name">HTML 0.36%</text>
+</svg>

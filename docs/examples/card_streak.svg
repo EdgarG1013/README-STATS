@@ -1,0 +1,60 @@
+<svg width="495" height="195" viewBox="0 0 495 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .stat-big {
+      font: 800 32px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #79dafa;
+    }
+    .stat-label {
+      font: 600 12px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #ff6e96;
+    }
+    .stat-date {
+      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #f8f8f2;
+      opacity: 0.85;
+    }
+    .rank-text {
+      font: 800 26px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      fill: #79dafa;
+    }
+
+    .rank-circle {
+      stroke: #ff6e96;
+      stroke-dasharray: 238.76104167282426;
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+    .rank-circle-rim {
+      stroke: #ff6e96;
+      stroke-width: 6;
+      opacity: 0.2;
+    }
+  </style>
+
+  <rect x="0" y="0" rx="14" width="495" height="195"
+    fill="#282a36" stroke="#6272a4" stroke-width="1" />
+
+  <!-- Divider lines -->
+  <line x1="197.5" y1="35" x2="197.5" y2="160" stroke="#6272a4" stroke-width="1"/>
+  <line x1="297.5" y1="35" x2="297.5" y2="160" stroke="#6272a4" stroke-width="1"/>
+
+  <!-- Total Contributions -->
+  <text x="97" y="75" class="stat-big" text-anchor="middle">633</text>
+  <text x="97" y="100" class="stat-label" text-anchor="middle">Total Contributions</text>
+  <text x="97" y="118" class="stat-date" text-anchor="middle">Aug 3 - Present</text>
+
+  <!-- Current Streak -->
+  <g transform="translate(247.5, 72)">
+    <circle cx="0" cy="0" r="38" fill="none" class="rank-circle-rim"/>
+    <circle cx="0" cy="0" r="38" fill="none" class="rank-circle"
+      stroke-dashoffset="0" transform="rotate(-90)"/>
+    <text x="0" y="8" class="rank-text" text-anchor="middle">28</text>
+  </g>
+  <text x="247.5" y="130" class="stat-label" text-anchor="middle">Current Streak</text>
+  <text x="247.5" y="148" class="stat-date" text-anchor="middle">Aug 12 - Sep 8</text>
+
+  <!-- Longest Streak -->
+  <text x="398" y="75" class="stat-big" text-anchor="middle">28</text>
+  <text x="398" y="100" class="stat-label" text-anchor="middle">Longest Streak</text>
+  <text x="398" y="118" class="stat-date" text-anchor="middle">Aug 12 - Sep 8</text>
+</svg>
