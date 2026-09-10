@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let apiUrl;
     switch (activeCard) {
       case "stats":
-        apiUrl = `${baseUrl}/api/card/stats?username=${username}&theme=${theme}`;
+        apiUrl = `${baseUrl}/api/card/stats?username=${username}&theme=${theme}&show_icons=true`;
         break;
       case "languages":
         apiUrl = `${baseUrl}/api/card/languages?username=${username}&theme=${theme}`;
@@ -115,13 +115,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (activeCard === "all") {
       cards.push(
-        `![Stats](${baseUrl}/api/card/stats?username=${username}&theme=${theme})`,
+        `![Stats](${baseUrl}/api/card/stats?username=${username}&theme=${theme}&show_icons=true)`,
         `![Languages](${baseUrl}/api/card/languages?username=${username}&theme=${theme})`,
         `![Streak](${baseUrl}/api/card/streak?username=${username}&theme=${theme})`
       );
     } else {
       const cardName = activeCard.charAt(0).toUpperCase() + activeCard.slice(1);
-      cards.push(`![${cardName}](${baseUrl}/api/card/${activeCard}?username=${username}&theme=${theme})`);
+      const extraParams = activeCard === "stats" ? "&show_icons=true" : "";
+      cards.push(`![${cardName}](${baseUrl}/api/card/${activeCard}?username=${username}&theme=${theme}${extraParams})`);
     }
 
     return cards.join("\n");
