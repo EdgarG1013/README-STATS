@@ -15,7 +15,7 @@ class Card {
     defaultTitle = "",
     titlePrefix = null,
     titleSuffix = null,
-    border_radius = 4.5,
+    border_radius = 2,
     paddingX = 25,
     paddingY = 45,
     colors = {},

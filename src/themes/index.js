@@ -4,7 +4,7 @@ const themes = {
     icon_color: "2f80ed",
     text_color: "333333",
     bg_color: "fffefe",
-    border_color: "e4e2e2",
+    border_color: "ffffff",
   },
   dark: {
     title_color: "fff",
