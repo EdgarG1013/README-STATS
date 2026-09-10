@@ -74,9 +74,7 @@ function renderStreakCard(streakData, theme) {
       font: 800 26px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
       fill: ${colors.iconColor};
     }
-    .flame {
-      fill: ${colors.ringColor};
-    }
+
     .rank-circle {
       stroke: ${colors.ringColor};
       stroke-dasharray: ${circumference};
@@ -105,7 +103,6 @@ function renderStreakCard(streakData, theme) {
 
   <!-- Current Streak -->
   <g transform="translate(${col2X}, ${paddingY + 42})">
-    <path class="flame" transform="translate(-7, -34) scale(0.6)" d="M12 2c1 3-2 4-2 7a2 2 0 0 0 4 0c1 1 2 2.5 2 4.5A5.5 5.5 0 0 1 10.5 19 5.5 5.5 0 0 1 5 13.5C5 9 9 7 8 2c2 1 3 2 3 2s-1-1 1 0z"/>
     <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle-rim"/>
     <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle"
       stroke-dashoffset="${ringOffset}" transform="rotate(-90)"/>

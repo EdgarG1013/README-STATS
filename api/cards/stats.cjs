@@ -93,7 +93,7 @@ function renderStatsCard(data, theme) {
       fill: ${colors.titleColor};
     }
     .stat {
-      font: 600 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
+      font: 700 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
       fill: ${colors.textColor};
     }
     .rank-text {

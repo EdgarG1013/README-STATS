@@ -217,15 +217,22 @@ app.get("/api/card/all", async (req, res) => {
     const toDataUri = (svg) => `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
 
     const gap = 16;
-    const cardWidth = 495;
-    const heights = [220, 180, 195, 240];
-    const totalHeight = heights.reduce((a, b) => a + b, 0) + gap * (heights.length - 1);
+    // Each card renders at its own natural width/height (the contributions
+    // graph is wider than the other three cards).
+    const sizes = [
+      { w: 495, h: 220 },
+      { w: 495, h: 194 },
+      { w: 495, h: 195 },
+      { w: 650, h: 320 },
+    ];
+    const cardWidth = Math.max(...sizes.map((s) => s.w));
+    const totalHeight = sizes.reduce((a, s) => a + s.h, 0) + gap * (sizes.length - 1);
 
     let y = 0;
     const images = [statsSvg, langsSvg, streakSvg, contribSvg]
       .map((svg, i) => {
-        const h = heights[i];
-        const img = `<image x="0" y="${y}" width="${cardWidth}" height="${h}" href="${toDataUri(svg)}"/>`;
+        const { w, h } = sizes[i];
+        const img = `<image x="0" y="${y}" width="${w}" height="${h}" href="${toDataUri(svg)}"/>`;
         y += h + gap;
         return img;
       })

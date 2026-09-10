@@ -42,14 +42,14 @@ function renderLanguagesCard(languages, theme) {
   });
 
   const width = 495;
-  const height = 180;
+  const height = 194;
   const border_radius = 14;
   const paddingX = 25;
   const paddingY = 35;
 
   const barHeight = 14;
   const barWidth = width - paddingX * 2;
-  const barY = paddingY + 12;
+  const barY = paddingY + 26;
   const barRadius = 7;
 
   const total = languages.reduce((s, l) => s + l.size, 0);
