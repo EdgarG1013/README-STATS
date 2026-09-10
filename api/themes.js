@@ -71,6 +71,7 @@ const themes = {
     icon_color: "79dafa",
     text_color: "f8f8f2",
     bg_color: "282a36",
+    border_color: "6272a4",
   },
   prussian: {
     title_color: "bddfff",
@@ -437,7 +438,7 @@ const themes = {
  */
 function getCardColors({ title_color, text_color, icon_color, bg_color, border_color, ring_color, theme }) {
   const selectedTheme = themes[theme] || themes["default"];
-  const fallback = (val, fb) => val || fb;
+  const fallback = (val, fb, def) => val || fb || def;
 
   const titleColor = "#" + fallback(title_color, selectedTheme.title_color);
   const textColor = "#" + fallback(text_color, selectedTheme.text_color);

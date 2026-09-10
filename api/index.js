@@ -30,6 +30,7 @@ function buildTheme(query) {
     bg_color: query.bg_color,
     border_color: query.border_color,
     ring_color: query.ring_color,
+    border_radius: query.border_radius ? Number(query.border_radius) : 14,
   };
 }
 

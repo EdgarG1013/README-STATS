@@ -38,12 +38,13 @@ function renderLanguagesCard(languages, theme) {
     icon_color: theme.icon_color,
     bg_color: theme.bg_color,
     border_color: theme.border_color,
+    ring_color: theme.ring_color,
     theme: theme.themeName,
   });
 
   const width = 495;
   const height = 194;
-  const border_radius = 14;
+  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
   const paddingX = 25;
   const paddingY = 35;
 
@@ -102,9 +103,8 @@ function renderLanguagesCard(languages, theme) {
     }
   </style>
 
-  <rect x="0.5" y="0.5" rx="${border_radius}" height="99%"
-    stroke="${colors.borderColor}" width="${width - 1}"
-    fill="${colors.bgColor}" />
+  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
+    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
 
   <text data-testid="card-title" x="${paddingX}" y="${paddingY}" class="header">Most Used Languages</text>
 

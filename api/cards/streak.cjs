@@ -40,7 +40,7 @@ function renderStreakCard(streakData, theme) {
 
   const width = 495;
   const height = 195;
-  const border_radius = 14;
+  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
   const paddingX = 25;
   const paddingY = 30;
 
@@ -88,9 +88,8 @@ function renderStreakCard(streakData, theme) {
     }
   </style>
 
-  <rect x="0.5" y="0.5" rx="${border_radius}" height="99%"
-    stroke="${colors.borderColor}" width="${width - 1}"
-    fill="${colors.bgColor}" />
+  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
+    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
 
   <!-- Divider lines -->
   <line x1="${col2X - 50}" y1="${dividerTop}" x2="${col2X - 50}" y2="${dividerBottom}" stroke="${colors.borderColor}" stroke-width="1"/>

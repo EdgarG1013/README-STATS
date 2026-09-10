@@ -7,6 +7,7 @@ function renderContributionsCard(username, contributionDays, theme) {
     icon_color: theme.icon_color,
     bg_color: theme.bg_color,
     border_color: theme.border_color,
+    ring_color: theme.ring_color,
     theme: theme.themeName,
   });
 
@@ -16,7 +17,7 @@ function renderContributionsCard(username, contributionDays, theme) {
 
   const width = 650;
   const height = 320;
-  const border_radius = 14;
+  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
   const padding = { top: 60, right: 35, bottom: 55, left: 60 };
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
@@ -93,9 +94,8 @@ function renderContributionsCard(username, contributionDays, theme) {
     </linearGradient>
   </defs>
 
-  <rect x="0.5" y="0.5" rx="${border_radius}" height="99%"
-    stroke="${colors.borderColor}" width="${width - 1}"
-    fill="${colors.bgColor}" />
+  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
+    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
 
   <text data-testid="card-title" x="${width / 2}" y="34" class="header" text-anchor="middle">${escapeXml(username)}'s Contribution Graph</text>
 
