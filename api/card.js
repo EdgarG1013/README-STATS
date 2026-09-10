@@ -355,4 +355,4 @@ const fetchStreakData = async (username) => {
   };
 };
 
-export { renderStats, renderLanguages, renderStreak, fetchStats, fetchLanguages, fetchContributions, themes };
+export { renderStats, renderLanguages, renderStreak, fetchStats, fetchLanguages, fetchContributions, fetchStreakData, themes };
