@@ -60,6 +60,7 @@ const themes = {
     icon_color: "bd93f9",
     text_color: "f8f8f2",
     bg_color: "282a36",
+    border_color: "ffffff",
   },
   oceano: {
     title_color: "246828",

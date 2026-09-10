@@ -52,6 +52,7 @@ const getStyles = ({ titleColor, textColor, iconColor, ringColor, show_icons, pr
     .bold { font-weight: 700 }
     .icon {
       fill: ${iconColor};
+      color: ${iconColor};
       display: ${show_icons ? "block" : "none"};
     }
     .rank-circle-rim {
