@@ -84,7 +84,7 @@ Es la forma más rápida de armar la URL correcta sin memorizar los parámetros 
 
 ### Despliegue
 
-El proyecto incluye `vercel.json`, así que puedes desplegarlo directamente en [Vercel](https://vercel.com) (recuerda configurar la variable de entorno `GITHUB_TOKEN` en el panel del proyecto). Una vez desplegado, reemplaza `http://localhost:3000` por tu dominio (ej. `https://tu-proyecto.vercel.app`) en todos los ejemplos de este README.
+El proyecto incluye `vercel.json`, así que puedes desplegarlo directamente en [Vercel](https://vercel.com) (recuerda configurar la variable de entorno `GITHUB_TOKEN` en el panel del proyecto). Una vez desplegado, reemplaza `http://localhost:3000` por tu dominio (ej. `https://readme-stats-two-rouge.vercel.app`) en todos los ejemplos de este README.
 
 ---
 
@@ -93,13 +93,13 @@ El proyecto incluye `vercel.json`, así que puedes desplegarlo directamente en [
 Simplemente agrega una imagen apuntando a tu API desplegada:
 
 ```markdown
-![Mis Stats de GitHub](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario)
+![Mis Stats de GitHub](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario)
 ```
 
 ### Ejemplo: Stats Card
 
 ```markdown
-![Stats](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&theme=dracula)
+![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&theme=dracula)
 ```
 
 Muestra: total de estrellas, commits del último año, PRs, issues, repos a los que contribuiste, y un anillo con tu **rank** (S, A+, A, A-, B+, B, B-, C+, C).
@@ -107,7 +107,7 @@ Muestra: total de estrellas, commits del último año, PRs, issues, repos a los 
 ### Ejemplo: Languages Card
 
 ```markdown
-![Lenguajes](https://tu-proyecto.vercel.app/api/card/languages?username=tu_usuario&theme=dracula&langs_count=6)
+![Lenguajes](https://readme-stats-two-rouge.vercel.app/api/card/languages?username=tu_usuario&theme=dracula&langs_count=6)
 ```
 
 | Parámetro     | Descripción                                   | Default |
@@ -117,7 +117,7 @@ Muestra: total de estrellas, commits del último año, PRs, issues, repos a los 
 ### Ejemplo: Streak Card
 
 ```markdown
-![Racha](https://tu-proyecto.vercel.app/api/card/streak?username=tu_usuario&theme=dracula)
+![Racha](https://readme-stats-two-rouge.vercel.app/api/card/streak?username=tu_usuario&theme=dracula)
 ```
 
 Muestra el total de contribuciones, la racha actual (con anillo de progreso) y la racha más larga.
@@ -125,7 +125,7 @@ Muestra el total de contribuciones, la racha actual (con anillo de progreso) y l
 ### Ejemplo: Contribution Graph
 
 ```markdown
-![Gráfica de contribuciones](https://tu-proyecto.vercel.app/api/card/contributions?username=tu_usuario&theme=dracula&days=31)
+![Gráfica de contribuciones](https://readme-stats-two-rouge.vercel.app/api/card/contributions?username=tu_usuario&theme=dracula&days=31)
 ```
 
 | Parámetro | Descripción                                | Default |
@@ -135,7 +135,7 @@ Muestra el total de contribuciones, la racha actual (con anillo de progreso) y l
 ### Combinar todas las tarjetas en una sola imagen
 
 ```markdown
-![GitHub Stats](https://tu-proyecto.vercel.app/api/card/all?username=tu_usuario&theme=dracula)
+![GitHub Stats](https://readme-stats-two-rouge.vercel.app/api/card/all?username=tu_usuario&theme=dracula)
 ```
 
 `all` apila las 4 tarjetas verticalmente en una única imagen SVG. Si prefieres organizarlas en cuadrícula (como en la vista previa de arriba), usa los endpoints individuales dentro de una tabla de Markdown/HTML:
@@ -143,11 +143,11 @@ Muestra el total de contribuciones, la racha actual (con anillo de progreso) y l
 ```markdown
 <table>
   <tr>
-    <td><img src="https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario" /></td>
-    <td><img src="https://tu-proyecto.vercel.app/api/card/languages?username=tu_usuario" /></td>
+    <td><img src="https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario" /></td>
+    <td><img src="https://readme-stats-two-rouge.vercel.app/api/card/languages?username=tu_usuario" /></td>
   </tr>
 </table>
-<img src="https://tu-proyecto.vercel.app/api/card/contributions?username=tu_usuario" />
+<img src="https://readme-stats-two-rouge.vercel.app/api/card/contributions?username=tu_usuario" />
 ```
 
 ---
@@ -182,7 +182,7 @@ Algunos de los 57 temas disponibles:
 Si no quieres usar un tema predefinido, puedes sobreescribir cada color manualmente (sin el símbolo `#`):
 
 ```markdown
-![Stats](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&title_color=ff6e96&text_color=f8f8f2&icon_color=79dafa&bg_color=282a36&border_color=3f4258&ring_color=ff6e96)
+![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&title_color=ff6e96&text_color=f8f8f2&icon_color=79dafa&bg_color=282a36&border_color=3f4258&ring_color=ff6e96)
 ```
 
 | Parámetro      | Qué colorea                                                  |
@@ -203,9 +203,9 @@ Cualquier color que pases explícitamente tiene prioridad sobre el `theme` elegi
 Controla el redondeo de las esquinas de la tarjeta (en píxeles). Por defecto es `14`.
 
 ```markdown
-![Stats](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&border_radius=0)
-![Stats](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&border_radius=14)
-![Stats](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&border_radius=30)
+![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&border_radius=0)
+![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&border_radius=14)
+![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&border_radius=30)
 ```
 
 <p align="center">
@@ -223,8 +223,8 @@ Funciona igual en las 4 tarjetas (`stats`, `languages`, `streak`, `contributions
 La Stats Card incluye un pequeño ícono junto a cada fila (⭐ estrellas, commits, PRs, issues, contribuciones). Puedes ocultarlos con `hide_icons=true`:
 
 ```markdown
-![Stats con iconos](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&hide_icons=false)
-![Stats sin iconos](https://tu-proyecto.vercel.app/api/card/stats?username=tu_usuario&hide_icons=true)
+![Stats con iconos](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&hide_icons=false)
+![Stats sin iconos](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&hide_icons=true)
 ```
 
 <p align="center">
