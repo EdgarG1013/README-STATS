@@ -7,74 +7,342 @@
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+  <div id="toast" class="toast"></div>
+
   <div class="container">
     <header>
       <h1>GitHub README Stats</h1>
-      <p>Generate custom GitHub stats cards for your README</p>
+      <p>Generate and customize GitHub stats cards for your README</p>
     </header>
 
     <main>
-      <div class="input-section">
+      <!-- ── LEFT SIDEBAR ── -->
+      <aside class="sidebar">
+
+        <!-- Username -->
         <div class="form-group">
           <label for="username">GitHub Username</label>
-          <input type="text" id="username" placeholder="Enter your GitHub username" />
+          <input type="text" id="username" placeholder="e.g. torvalds" autocomplete="off" />
         </div>
 
+        <!-- Theme -->
         <div class="form-group">
           <label for="theme">Theme</label>
           <select id="theme">
             <option value="default">Default</option>
             <option value="dark">Dark</option>
-            <option value="radical">Radical</option>
+            <option value="radikal">Radikal</option>
             <option value="tokyonight">Tokyo Night</option>
             <option value="onedark">One Dark</option>
             <option value="cobalt">Cobalt</option>
             <option value="gruvbox">Gruvbox</option>
-            <option value="dracula">Dracula</option>
+            <option value="gruvbox_light">Gruvbox Light</option>
+            <option value="gruvbox_dark">Gruvbox Dark</option>
             <option value="monokai">Monokai</option>
+            <option value="monokai_machall">Monokai Machall</option>
+            <option value="monokai_violet">Monokai Violet</option>
+            <option value="dracula" selected>Dracula</option>
+            <option value="darcula">Darcula</option>
+            <option value="oceano">Oceano</option>
+            <option value="nightowl">Night Owl</option>
+            <option value="buefy">Buefy</option>
+            <option value="bluegreen">Blue Green</option>
+            <option value="algolia">Algolia</option>
+            <option value="greatgates">Great Gates</option>
+            <option value="merko">Merko</option>
+            <option value="ayu_mirage">Ayu Mirage</option>
+            <option value="seti">Seti</option>
+            <option value="bearded">Bearded</option>
+            <option value="bearded_blue">Bearded Blue</option>
             <option value="nord">Nord</option>
             <option value="gotham">Gotham</option>
-            <option value="material-palenight">Material Palenight</option>
+            <option value="material_palenight">Material Palenight</option>
+            <option value="graywhite">Gray White</option>
+            <option value="vision_nobledark">Vision Noble Dark</option>
+            <option value="visions_stellar">Visions Stellar</option>
+            <option value="dark_smoky">Dark Smoky</option>
             <option value="github_dark">GitHub Dark</option>
+            <option value="github_dark_dimmed">GitHub Dark Dimmed</option>
+            <option value="github_dark_tritanopia">GitHub Dark Tritanopia</option>
+            <option value="github_dark_high_contrast">GitHub Dark High Contrast</option>
+            <option value="redical">Redical</option>
+            <option value="coral">Coral</option>
+            <option value="owl">Owl</option>
+            <option value="newsletter">Newsletter</option>
             <option value="blue_navy">Blue Navy</option>
-            <option value="aura_dark">Aura Dark</option>
-            <option value="vision-friendly-dark">Vision Friendly Dark</option>
+            <option value="decaf">Decaf</option>
+            <option value="panda">Panda</option>
+            <option value="orangey_brown">Orangey Brown</option>
+            <option value="transparent">Transparent</option>
+            <option value="yellowdark">Yellow Dark</option>
+            <option value="chartreuse_dark">Chartreuse Dark</option>
+            <option value="neon_dark">Neon Dark</option>
+            <option value="cap_puccin_macciato">Cappuccin Macciato</option>
+            <option value="kenobi">Kenobi</option>
+            <option value="rainbow_dark">Rainbow Dark</option>
+            <option value="tokyo_night">Tokyo Night 2</option>
+            <option value="dukecity">Duke City</option>
+            <option value="replic__">Replic</option>
+            <option value="one_night">One Night</option>
+            <option value="china_unicom">China Unicom</option>
+            <option value="blind">Blind</option>
+            <option value="christmas">Christmas</option>
+            <option value="temporal_night">Temporal Night</option>
           </select>
         </div>
 
+        <!-- Card type tabs -->
         <div class="tabs">
-          <button class="tab active" data-card="stats">Stats Card</button>
-          <button class="tab" data-card="languages">Languages Card</button>
-          <button class="tab" data-card="streak">Streak Card</button>
+          <button class="tab active" data-card="stats">Stats</button>
+          <button class="tab" data-card="languages">Languages</button>
+          <button class="tab" data-card="streak">Streak</button>
           <button class="tab" data-card="contributions">Contributions</button>
         </div>
-      </div>
 
+        <!-- ── CUSTOMIZATION PANEL ── -->
+        <div class="customization-panel">
+
+          <!-- Colors section -->
+          <div class="section-header" data-toggle="colors-body">
+            <span>Colors</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+              <path d="M2 4l4 4 4-4"/>
+            </svg>
+          </div>
+          <div class="section-body" id="colors-body">
+            <div class="color-row">
+              <label>Title</label>
+              <div class="color-input-group">
+                <input type="color" id="title_color" value="#ff79c6" />
+                <input type="text" id="title_color_hex" class="hex-input" value="ff79c6" maxlength="6" />
+              </div>
+            </div>
+            <div class="color-row">
+              <label>Text</label>
+              <div class="color-input-group">
+                <input type="color" id="text_color" value="#f8f8f2" />
+                <input type="text" id="text_color_hex" class="hex-input" value="f8f8f2" maxlength="6" />
+              </div>
+            </div>
+            <div class="color-row">
+              <label>Icons</label>
+              <div class="color-input-group">
+                <input type="color" id="icon_color" value="#bd93f9" />
+                <input type="text" id="icon_color_hex" class="hex-input" value="bd93f9" maxlength="6" />
+              </div>
+            </div>
+            <div class="color-row">
+              <label>Background</label>
+              <div class="color-input-group">
+                <input type="color" id="bg_color" value="#282a36" />
+                <input type="text" id="bg_color_hex" class="hex-input" value="282a36" maxlength="6" />
+              </div>
+            </div>
+            <div class="color-row">
+              <label>Border</label>
+              <div class="color-input-group">
+                <input type="color" id="border_color" value="#6272a4" />
+                <input type="text" id="border_color_hex" class="hex-input" value="6272a4" maxlength="6" />
+              </div>
+            </div>
+            <div class="color-row" id="ring-color-row">
+              <label>Ring</label>
+              <div class="color-input-group">
+                <input type="color" id="ring_color" value="#ff79c6" />
+                <input type="text" id="ring_color_hex" class="hex-input" value="ff79c6" maxlength="6" />
+              </div>
+            </div>
+            <button class="btn-reset-colors" id="reset-colors-btn">Reset to theme defaults</button>
+          </div>
+
+          <!-- Appearance section -->
+          <div class="section-header" data-toggle="appearance-body">
+            <span>Appearance</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+              <path d="M2 4l4 4 4-4"/>
+            </svg>
+          </div>
+          <div class="section-body" id="appearance-body">
+            <div class="slider-row">
+              <label>Border Radius <span id="radius-value">14</span>px</label>
+              <input type="range" id="border_radius" min="0" max="24" value="14" />
+            </div>
+            <div class="slider-row" id="card-width-row">
+              <label>Card Width <span id="width-value">495</span>px</label>
+              <input type="range" id="card_width" min="300" max="600" step="5" value="495" />
+            </div>
+
+            <div class="toggle-row" id="show-icons-row">
+              <label>Show Icons</label>
+              <label class="toggle">
+                <input type="checkbox" id="show_icons" checked />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <label>Hide Title</label>
+              <label class="toggle">
+                <input type="checkbox" id="hide_title" />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <label>Hide Border</label>
+              <label class="toggle">
+                <input type="checkbox" id="hide_border" />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+            <div class="toggle-row" id="hide-rank-row">
+              <label>Hide Rank</label>
+              <label class="toggle">
+                <input type="checkbox" id="hide_rank" />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Stats-specific options -->
+          <div id="stats-options">
+            <div class="section-header" data-toggle="hide-stats-body">
+              <span>Hide Stats</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M2 4l4 4 4-4"/>
+              </svg>
+            </div>
+            <div class="section-body" id="hide-stats-body">
+              <div class="checkbox-grid">
+                <label class="checkbox-item">
+                  <input type="checkbox" id="hide_stars" />
+                  <span>Stars</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="hide_commits" />
+                  <span>Commits</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="hide_prs" />
+                  <span>PRs</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="hide_issues" />
+                  <span>Issues</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="hide_contribs" />
+                  <span>Contributed</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Languages-specific options -->
+          <div id="languages-options" style="display:none">
+            <div class="section-header" data-toggle="langs-opts-body">
+              <span>Languages Options</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M2 4l4 4 4-4"/>
+              </svg>
+            </div>
+            <div class="section-body" id="langs-opts-body">
+              <div class="slider-row">
+                <label>Languages Count <span id="langs-count-value">6</span></label>
+                <input type="range" id="langs_count" min="1" max="15" value="6" />
+              </div>
+              <div class="form-group" style="margin-top:0.75rem">
+                <label>Layout</label>
+                <div class="segmented" id="layout-toggle">
+                  <button class="seg active" data-value="compact">Compact</button>
+                  <button class="seg" data-value="normal">Normal</button>
+                </div>
+              </div>
+              <div class="toggle-row" style="margin-top:0.75rem">
+                <label>Hide Progress Bars</label>
+                <label class="toggle">
+                  <input type="checkbox" id="hide_progress" />
+                  <span class="slider-toggle"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contributions-specific options -->
+          <div id="contributions-options" style="display:none">
+            <div class="section-header" data-toggle="contrib-opts-body">
+              <span>Contributions Options</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M2 4l4 4 4-4"/>
+              </svg>
+            </div>
+            <div class="section-body" id="contrib-opts-body">
+              <div class="slider-row">
+                <label>Days shown <span id="days-value">31</span></label>
+                <input type="range" id="contrib_days" min="7" max="90" value="31" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- end customization-panel -->
+
+      </aside>
+      <!-- end sidebar -->
+
+      <!-- ── RIGHT: PREVIEW ── -->
       <div class="preview-section">
+        <div class="preview-header">
+          <span class="preview-label">Preview</span>
+          <span class="auto-preview-tag">Auto-preview on</span>
+        </div>
         <div class="preview-card" id="preview-container">
           <div class="preview-placeholder">
-            Enter your GitHub username to see the preview
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <path d="M3 9h18M9 21V9"/>
+            </svg>
+            <p>Enter your GitHub username to preview</p>
           </div>
         </div>
 
         <div class="actions">
-          <button id="generate-btn" class="btn primary">Generate Card</button>
-          <button id="copy-btn" class="btn secondary" disabled>Copy Markdown</button>
+          <button id="generate-btn" class="btn primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Generate
+          </button>
+          <button id="copy-btn" class="btn secondary" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            Copy Markdown
+          </button>
+          <button id="download-btn" class="btn ghost" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            SVG
+          </button>
         </div>
 
         <div class="code-section" id="code-section" style="display: none;">
           <div class="code-header">
-            <span>Markdown Code</span>
+            <span>Markdown</span>
             <button id="copy-code" class="btn small">Copy</button>
           </div>
           <pre><code id="markdown-code"></code></pre>
         </div>
       </div>
+      <!-- end preview section -->
+
     </main>
 
     <section class="support-section">
       <a href="https://github.com/EdgarG1013/README-STATS" target="_blank" class="star-btn">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L1.818 6.37a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L1.818 6.37a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/>
+        </svg>
         Star on GitHub
       </a>
     </section>
