@@ -1,4 +1,5 @@
 .agents
 .vercel
 .env
+.claude
 node_modules
