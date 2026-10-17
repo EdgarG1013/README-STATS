@@ -9,11 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const formatTabs = document.querySelectorAll(".format-tab");
   const previewContainer = $("preview-container");
   const previewBody = $("preview-body");
-  const bgToggle = $("bg-toggle");
+  const bgOptions = document.querySelectorAll(".bg-opt");
+  const statusEl = $("status");
+  const userForm = $("user-form");
   const codeSection = $("code-section");
   const markdownCode = $("markdown-code");
   const copyCodeBtn = $("copy-code");
   const resetBtn = $("reset-btn");
+  const SUGGESTIONS = ["EdgarG1013", "torvalds", "gaearon", "sindresorhus"];
   const toast = $("toast");
   const colorInputs = document.querySelectorAll(".color-grid input[type=color]");
   const ranges = ["border_radius", "langs_count", "days"].map($);
@@ -72,6 +75,36 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.classList.add("visible");
     clearTimeout(showToast.timer);
     showToast.timer = setTimeout(() => toast.classList.remove("visible"), 1800);
+  }
+
+  function setStatus(state, text) {
+    statusEl.dataset.state = state;
+    statusEl.textContent = text;
+  }
+
+  function showEmptyState() {
+    const wrap = document.createElement("div");
+    wrap.className = "empty-state";
+    wrap.innerHTML = `
+      <div class="empty-grid" aria-hidden="true">${"<i></i>".repeat(28)}</div>
+      <p class="empty-title">Escribe tu usuario para empezar</p>
+      <p class="empty-sub">o prueba con alguno de estos:</p>`;
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    SUGGESTIONS.forEach((name) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = name;
+      chip.addEventListener("click", () => {
+        usernameInput.value = name;
+        generateCard();
+      });
+      chips.append(chip);
+    });
+    wrap.append(chips);
+    previewBody.replaceChildren(wrap);
+    setStatus("idle", "Esperando usuario");
   }
 
   function setPlaceholder(message, isError = false) {
@@ -154,7 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
     themeCurrent.textContent = state.theme;
     renderThemeGrid();
     syncColorPickers();
-    themeGrid.querySelector(".active")?.scrollIntoView({ block: "nearest" });
+    const active = themeGrid.querySelector(".active");
+    if (active) themeGrid.scrollTop = active.offsetTop - themeGrid.clientHeight / 2 + active.offsetHeight / 2;
   }
 
   // ---------- Preview ----------
@@ -169,13 +203,14 @@ document.addEventListener("DOMContentLoaded", () => {
     syncUrl();
     if (!username) {
       codeSection.hidden = true;
-      setPlaceholder("Escribe un usuario de GitHub para ver la vista previa");
+      showEmptyState();
       return;
     }
 
     controller?.abort();
     controller = new AbortController();
 
+    setStatus("loading", "Generando…");
     const hasImage = previewBody.querySelector("img");
     if (hasImage) previewBody.classList.add("loading");
     else previewBody.replaceChildren(Object.assign(document.createElement("div"), { className: "skeleton" }));
@@ -200,6 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.src = currentObjectUrl;
       await img.decode().catch(() => {});
       previewBody.replaceChildren(img);
+      setStatus("ok", `@${username}`);
 
       try { localStorage.setItem("rs:username", username); } catch {}
       updateCode();
@@ -213,6 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
         message = `No se encontró el usuario "${username}".`;
       }
       codeSection.hidden = true;
+      setStatus("error", "Error");
       setPlaceholder(message, true);
       console.error(error);
     } finally {
@@ -276,7 +313,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const hex = normalizeHex(params.get(input.dataset.param));
       if (hex) state.colors[input.dataset.param] = hex;
     });
-    if (Object.keys(state.colors).length) $("customize").open = true;
   }
 
   // ---------- Controls ----------
@@ -309,8 +345,9 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   usernameInput.addEventListener("input", () => scheduleGenerate(600));
-  usernameInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") scheduleGenerate(0);
+  userForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    scheduleGenerate(0);
   });
 
   themeSearch.addEventListener("input", renderThemeGrid);
@@ -336,16 +373,18 @@ document.addEventListener("DOMContentLoaded", () => {
     scheduleGenerate(0);
   });
 
-  bgToggle.addEventListener("click", () => {
-    const next = previewContainer.dataset.bg === "dark" ? "light" : "dark";
-    previewContainer.dataset.bg = next;
-    bgToggle.textContent = `Fondo: ${next === "dark" ? "oscuro" : "claro"}`;
-  });
+  bgOptions.forEach((btn) =>
+    btn.addEventListener("click", () => {
+      previewContainer.dataset.bg = btn.dataset.bg;
+      bgOptions.forEach((b) => b.classList.toggle("active", b === btn));
+    }),
+  );
 
   // ---------- Init ----------
 
   restoreFromUrl();
   setActiveCard(state.card);
+  showEmptyState();
   loadThemes().then(() => {
     if (usernameInput.value.trim()) generateCard();
   });

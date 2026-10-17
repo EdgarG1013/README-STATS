@@ -3,119 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub README Stats</title>
+  <meta name="description" content="Genera tarjetas SVG con tus estadísticas de GitHub para tu README.">
+  <meta name="theme-color" content="#0a0c10">
+  <title>README Stats · Estudio de tarjetas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>GitHub README Stats</h1>
-      <p>Genera tarjetas de estadísticas de GitHub para tu README</p>
-    </header>
+  <div class="backdrop" aria-hidden="true"></div>
 
-    <main>
-      <aside class="input-section">
-        <div class="form-group">
-          <label for="username">Usuario de GitHub</label>
-          <input type="text" id="username" placeholder="ej. EdgarG1013" autocomplete="off" spellcheck="false" />
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="brand-name">readme<span>/stats</span></span>
+    </a>
+    <a href="https://github.com/EdgarG1013/README-STATS" target="_blank" rel="noopener" class="star-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L1.818 6.37a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+      <span>Star</span>
+    </a>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Estudio de tarjetas para tu perfil</p>
+    <h1>Tu actividad en GitHub,<br><em>lista para tu README.</em></h1>
+
+    <form class="user-field" id="user-form" autocomplete="off">
+      <label for="username" class="visually-hidden">Usuario de GitHub</label>
+      <span class="user-prefix" aria-hidden="true">github.com/</span>
+      <input type="text" id="username" placeholder="tu-usuario" spellcheck="false" autocapitalize="off" />
+      <button type="submit" class="btn primary" id="go-btn">
+        Generar
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+    </form>
+    <p class="hint">La vista previa se actualiza sola mientras ajustas las opciones.</p>
+  </section>
+
+  <main class="workspace">
+    <div class="stage-tabs">
+      <span class="step-label"><b>01</b> Tarjeta</span>
+      <div class="tabs" role="tablist" aria-label="Tipo de tarjeta">
+        <button class="tab active" role="tab" aria-selected="true" data-card="stats">Stats</button>
+        <button class="tab" role="tab" aria-selected="false" data-card="languages">Lenguajes</button>
+        <button class="tab" role="tab" aria-selected="false" data-card="streak">Racha</button>
+        <button class="tab" role="tab" aria-selected="false" data-card="contributions">Actividad</button>
+        <button class="tab" role="tab" aria-selected="false" data-card="all">Todas</button>
+      </div>
+    </div>
+
+    <section class="preview-card" id="preview-container" data-bg="dark" aria-label="Vista previa">
+      <div class="preview-toolbar">
+        <span class="status" id="status" data-state="idle">Esperando usuario</span>
+        <div class="bg-switch" role="group" aria-label="Fondo de la vista previa">
+          <button type="button" class="bg-opt active" data-bg="dark">Oscuro</button>
+          <button type="button" class="bg-opt" data-bg="light">Claro</button>
         </div>
-
-        <div class="form-group">
-          <div class="label-row">
-            <label for="theme-search">Tema</label>
-            <span class="theme-current" id="theme-current">dracula</span>
-          </div>
-          <input type="search" id="theme-search" placeholder="Buscar tema…" />
-          <div class="theme-grid" id="theme-grid" role="listbox" aria-label="Temas"></div>
-        </div>
-
-        <details class="customize" id="customize">
-          <summary>Personalizar</summary>
-
-          <div class="form-group">
-            <div class="label-row">
-              <label for="border_radius">Radio del borde</label>
-              <output id="border_radius-value">14</output>
-            </div>
-            <input type="range" id="border_radius" min="0" max="30" value="14" />
-          </div>
-
-          <div class="color-grid">
-            <label class="color-field"><input type="color" data-param="title_color" /><span>Título</span></label>
-            <label class="color-field"><input type="color" data-param="text_color" /><span>Texto</span></label>
-            <label class="color-field"><input type="color" data-param="icon_color" /><span>Iconos</span></label>
-            <label class="color-field"><input type="color" data-param="bg_color" /><span>Fondo</span></label>
-            <label class="color-field"><input type="color" data-param="border_color" /><span>Borde</span></label>
-            <label class="color-field"><input type="color" data-param="ring_color" /><span>Anillo</span></label>
-          </div>
-
-          <div class="form-group" data-only="languages all">
-            <div class="label-row">
-              <label for="langs_count">Lenguajes a mostrar</label>
-              <output id="langs_count-value">6</output>
-            </div>
-            <input type="range" id="langs_count" min="1" max="10" value="6" />
-          </div>
-
-          <div class="form-group" data-only="contributions all">
-            <div class="label-row">
-              <label for="days">Días de actividad</label>
-              <output id="days-value">31</output>
-            </div>
-            <input type="range" id="days" min="7" max="365" step="1" value="31" />
-          </div>
-
-          <button type="button" class="btn small ghost" id="reset-btn">Restablecer colores</button>
-        </details>
-      </aside>
-
-      <section class="preview-section">
-        <div class="tabs" role="tablist" aria-label="Tipo de tarjeta">
-          <button class="tab active" role="tab" aria-selected="true" data-card="stats">Stats</button>
-          <button class="tab" role="tab" aria-selected="false" data-card="languages">Lenguajes</button>
-          <button class="tab" role="tab" aria-selected="false" data-card="streak">Racha</button>
-          <button class="tab" role="tab" aria-selected="false" data-card="contributions">Actividad</button>
-          <button class="tab" role="tab" aria-selected="false" data-card="all">Todas</button>
-        </div>
-
-        <div class="preview-card" id="preview-container" data-bg="dark">
-          <div class="preview-toolbar">
-            <button type="button" class="bg-toggle" id="bg-toggle" aria-label="Cambiar fondo de la vista previa">Fondo: oscuro</button>
-          </div>
-          <div class="preview-body" id="preview-body">
-            <p class="preview-placeholder">Escribe un usuario de GitHub para ver la vista previa</p>
-          </div>
-        </div>
-
-        <div class="code-section" id="code-section" hidden>
-          <div class="code-header">
-            <div class="format-tabs" role="tablist" aria-label="Formato">
-              <button class="format-tab active" data-format="markdown">Markdown</button>
-              <button class="format-tab" data-format="html">HTML</button>
-              <button class="format-tab" data-format="url">URL</button>
-            </div>
-            <button id="copy-code" class="btn small primary">Copiar</button>
-          </div>
-          <pre><code id="markdown-code"></code></pre>
-        </div>
-      </section>
-    </main>
-
-    <section class="support-section">
-      <a href="https://github.com/EdgarG1013/README-STATS" target="_blank" rel="noopener" class="star-btn">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L1.818 6.37a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
-        Star en GitHub
-      </a>
+      </div>
+      <div class="preview-body" id="preview-body"></div>
     </section>
 
-    <footer>
-      <p>Hecho con la ayuda de:</p>
-      <div class="credits-links">
-        <a href="https://github.com/Ashutosh00710/github-readme-activity-graph" target="_blank" rel="noopener">github-readme-activity-graph</a>
-        <a href="https://github.com/Pranesh-2005/github-readme-stats-fast" target="_blank" rel="noopener">github-readme-stats-fast</a>
+    <aside class="controls">
+      <section class="panel">
+        <div class="panel-head">
+          <span class="step-label"><b>02</b> Tema</span>
+          <span class="theme-current" id="theme-current">dracula</span>
+        </div>
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+          <input type="search" id="theme-search" placeholder="Buscar entre los temas…" aria-label="Buscar tema" />
+        </div>
+        <div class="theme-grid" id="theme-grid" role="listbox" aria-label="Temas"></div>
+      </section>
+
+      <section class="panel" id="customize">
+        <div class="panel-head">
+          <span class="step-label"><b>03</b> Ajustes</span>
+          <button type="button" class="link-btn" id="reset-btn">Restablecer colores</button>
+        </div>
+
+        <div class="color-grid">
+          <label class="color-field"><input type="color" data-param="title_color" /><span>Título</span></label>
+          <label class="color-field"><input type="color" data-param="text_color" /><span>Texto</span></label>
+          <label class="color-field"><input type="color" data-param="icon_color" /><span>Iconos</span></label>
+          <label class="color-field"><input type="color" data-param="bg_color" /><span>Fondo</span></label>
+          <label class="color-field"><input type="color" data-param="border_color" /><span>Borde</span></label>
+          <label class="color-field"><input type="color" data-param="ring_color" /><span>Anillo</span></label>
+        </div>
+
+        <div class="range-field">
+          <div class="range-head"><label for="border_radius">Radio del borde</label><output id="border_radius-value">14</output></div>
+          <input type="range" id="border_radius" min="0" max="30" value="14" />
+        </div>
+
+        <div class="range-field" data-only="languages all">
+          <div class="range-head"><label for="langs_count">Lenguajes a mostrar</label><output id="langs_count-value">6</output></div>
+          <input type="range" id="langs_count" min="1" max="10" value="6" />
+        </div>
+
+        <div class="range-field" data-only="contributions all">
+          <div class="range-head"><label for="days">Días de actividad</label><output id="days-value">31</output></div>
+          <input type="range" id="days" min="7" max="365" value="31" />
+        </div>
+      </section>
+    </aside>
+
+    <section class="code-section" id="code-section" hidden>
+      <div class="code-header">
+        <span class="step-label"><b>04</b> Copiar</span>
+        <div class="format-tabs" role="tablist" aria-label="Formato">
+          <button class="format-tab active" data-format="markdown">Markdown</button>
+          <button class="format-tab" data-format="html">HTML</button>
+          <button class="format-tab" data-format="url">URL</button>
+        </div>
       </div>
-    </footer>
-  </div>
+      <div class="code-body">
+        <pre><code id="markdown-code"></code></pre>
+        <button id="copy-code" class="btn primary copy-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>
+          Copiar
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Hecho con la ayuda de</span>
+    <a href="https://github.com/Ashutosh00710/github-readme-activity-graph" target="_blank" rel="noopener">github-readme-activity-graph</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/Pranesh-2005/github-readme-stats-fast" target="_blank" rel="noopener">github-readme-stats-fast</a>
+  </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
