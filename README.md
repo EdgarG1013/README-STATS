@@ -295,4 +295,4 @@ docs/examples/         → SVGs de ejemplo usados en este README
 
 ## 📄 Licencia
 
-Este proyecto está pensado como una plantilla personal/educativa inspirada en [github-readme-stats](https://github.com/anuraghazra/github-readme-stats). Úsalo y modifícalo libremente para tu propio perfil.
+Este proyecto está pensado como una plantilla personal inspirada en [github-readme-stats](https://github.com/anuraghazra/github-readme-stats). Úsalo y modifícalo libremente para tu propio perfil.
