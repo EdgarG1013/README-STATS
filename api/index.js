@@ -18,18 +18,26 @@ const { renderStatsCard } = require("./cards/stats.cjs");
 const { renderLanguagesCard } = require("./cards/languages.cjs");
 const { renderStreakCard } = require("./cards/streak.cjs");
 const { renderContributionsCard } = require("./cards/contributions.cjs");
+const { themes: renderThemes } = require("./themes.cjs");
+
+// The renderers only know the themes in ./themes.cjs. Themes that exist only in
+// src/themes are resolved here and passed as explicit colors, so every theme the
+// UI lists renders correctly. On name clashes the renderer's palette wins.
+const allThemes = { ...themes, ...renderThemes };
 
 // Builds the theme object expected by the ./cards/*.js renderers from query params.
 // Defaults to the "dracula" palette (dark navy card, pink titles, cyan accents).
 function buildTheme(query) {
+  const themeName = query.theme || "dracula";
+  const extra = renderThemes[themeName] ? {} : themes[themeName] || {};
   return {
-    themeName: query.theme || "dracula",
-    title_color: query.title_color,
-    text_color: query.text_color,
-    icon_color: query.icon_color,
-    bg_color: query.bg_color,
-    border_color: query.border_color,
-    ring_color: query.ring_color,
+    themeName,
+    title_color: query.title_color || extra.title_color,
+    text_color: query.text_color || extra.text_color,
+    icon_color: query.icon_color || extra.icon_color,
+    bg_color: query.bg_color || extra.bg_color,
+    border_color: query.border_color || extra.border_color,
+    ring_color: query.ring_color || extra.title_color,
     border_radius: query.border_radius ? Number(query.border_radius) : 14,
   };
 }
@@ -53,7 +61,7 @@ app.get("/", (req, res) => {
 
 // Themes endpoint
 app.get("/api/themes", (req, res) => {
-  res.json({ themes: Object.keys(themes), details: themes });
+  res.json({ themes: Object.keys(allThemes), details: allThemes });
 });
 
 // Stats card endpoint
