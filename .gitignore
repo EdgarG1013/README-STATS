@@ -3,3 +3,4 @@
 .env
 .claude
 node_modules
+skills-lock.json

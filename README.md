@@ -1,315 +1,300 @@
-# 📊 GitHub README Stats (Custom)
-
-Genera tarjetas SVG dinámicas y personalizables con tus estadísticas de GitHub para mostrar en tu perfil o en el `README.md` de cualquier repositorio: estadísticas generales, lenguajes más usados, racha de contribuciones y una gráfica de actividad — todo con un diseño oscuro, moderno y 100% personalizable.
+<h1 align="center">readme/stats</h1>
 
 <p align="center">
-  <img src="./docs/examples/card_stats.svg" width="420" />
-  <img src="./docs/examples/card_languages.svg" width="420" />
+  Tarjetas SVG con tus estadísticas de GitHub, listas para tu perfil o el README de cualquier repositorio.<br/>
+  Diseñadas desde un estudio visual con vista previa en vivo, más de 100 temas y 6 idiomas.
 </p>
+
 <p align="center">
-  <img src="./docs/examples/card_streak.svg" width="420" />
+  <a href="https://readme-stats-two-rouge.vercel.app/"><img alt="Demo" src="https://img.shields.io/badge/demo-en%20vivo-b6f36a?style=flat-square&labelColor=11141a"></a>
+  <img alt="Node" src="https://img.shields.io/badge/node-%E2%89%A518-b6f36a?style=flat-square&labelColor=11141a">
+  <img alt="Vercel" src="https://img.shields.io/badge/deploy-vercel-b6f36a?style=flat-square&labelColor=11141a">
+  <a href="./LICENSE"><img alt="Licencia MIT" src="https://img.shields.io/badge/licencia-MIT-b6f36a?style=flat-square&labelColor=11141a"></a>
 </p>
+
 <p align="center">
-  <img src="./docs/examples/card_contributions.svg" width="860" />
+  <a href="https://readme-stats-two-rouge.vercel.app/">
+    <img src="./docs/demo.gif" alt="Demo del estudio: escribir usuario, elegir tema, cambiar de tarjeta, traducir y copiar el Markdown" width="860" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://readme-stats-two-rouge.vercel.app/"><b>Abrir el estudio →</b></a>
 </p>
 
 ---
 
-## ✨ Características
+## Contenido
 
-- 🟣 **4 tarjetas independientes**: Stats, Most Used Languages, Streak Stats y Contribution Graph.
-- 🎨 **57 temas** predefinidos (`dracula`, `radical`, `tokyonight`, `github_dark`, `nord`, etc.) o colores 100% a tu gusto.
-- 🔘 **`border_radius` configurable** en todas las tarjetas.
-- 🖼️ **Iconos activables/desactivables** en la tarjeta de Stats.
-- 🧩 Endpoint `all` para combinar las 4 tarjetas en una sola imagen.
-- ⚡ Backend en Express, listo para correr local o desplegar en Vercel.
+- [Características](#características)
+- [Tarjetas](#tarjetas)
+- [El estudio web](#el-estudio-web)
+- [Uso rápido](#uso-rápido)
+- [Personalización](#personalización)
+- [Referencia de parámetros](#referencia-de-parámetros)
+- [Instalación local](#instalación-local)
+- [Despliegue en Vercel](#despliegue-en-vercel)
+- [Seguridad y caché](#seguridad-y-caché)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Solución de problemas](#solución-de-problemas)
 
 ---
 
-## 🚀 Instalación y uso local
+## Características
+
+| | |
+| --- | --- |
+| **4 tarjetas + combinada** | Stats con rank, lenguajes más usados, racha de contribuciones y gráfica de actividad, o las 4 en una sola imagen. |
+| **Estudio visual** | Vista previa en vivo, sin escribir URLs a mano. Copia el resultado en Markdown, HTML o URL. |
+| **+100 temas** | `dracula`, `tokyonight`, `nord`, `github_dark`, `catppuccin`, temas con degradado… o tus propios colores. |
+| **6 idiomas** | Inglés, español, portugués, francés, alemán e italiano. Commits, PRs e Issues se mantienen en inglés. |
+| **Control del contenido** | Título propio, filas visibles, rank, iconos, borde, lenguajes excluidos y rango de días. |
+| **Listo para producción** | Entradas validadas, CSP en cada tarjeta, caché en CDN y límite de peticiones. |
+
+---
+
+## Tarjetas
+
+<table>
+  <tr>
+    <td align="center"><b>Stats</b><br/><code>/api/card/stats</code></td>
+    <td align="center"><b>Lenguajes</b><br/><code>/api/card/languages</code></td>
+  </tr>
+  <tr>
+    <td><img src="./docs/examples/card_stats.svg" alt="Stats card" /></td>
+    <td><img src="./docs/examples/card_languages.svg" alt="Languages card" /></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><b>Racha</b> · <code>/api/card/streak</code></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><img src="./docs/examples/card_streak.svg" alt="Streak card" width="495" /></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><b>Actividad</b> · <code>/api/card/contributions</code></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><img src="./docs/examples/card_contributions.svg" alt="Contribution graph" /></td>
+  </tr>
+</table>
+
+- **Stats**: estrellas, commits del último año, PRs, issues, repositorios a los que contribuiste y un anillo con tu **rank** (S → C).
+- **Lenguajes**: barra proporcional con hasta 10 lenguajes, calculada sobre tus repositorios propios.
+- **Racha**: contribuciones del último año, racha actual (días seguidos hasta hoy) y la racha más larga.
+- **Actividad**: gráfica de contribuciones diarias de los últimos 7 a 365 días.
+- **Todas**: `/api/card/all` apila las 4 tarjetas en una sola imagen SVG.
+
+---
+
+## El estudio web
+
+El proyecto incluye un frontend (`ui/`) para crear tus tarjetas visualmente. Pruébalo en **[readme-stats-two-rouge.vercel.app](https://readme-stats-two-rouge.vercel.app/)**, o en local en `http://localhost:3000` tras `npm start`.
+
+1. **Escribe tu usuario** de GitHub, o prueba con una de las sugerencias.
+2. **Elige la tarjeta**: Stats, Lenguajes, Racha, Actividad o Todas.
+3. **Elige un tema** en la cuadrícula de muestras, con buscador.
+4. **Ajusta el contenido** (idioma, título, filas, rank, iconos, lenguajes) y **el estilo** (colores, degradado, radio del borde).
+5. **Copia** el snippet en Markdown, HTML o URL y pégalo en tu README.
+
+Cada cambio regenera la vista previa al instante. Puedes ver la tarjeta sobre fondo claro u oscuro, y la configuración queda guardada en la URL de la página para compartirla.
+
+---
+
+## Uso rápido
+
+Añade una imagen que apunte a la API:
+
+```markdown
+![GitHub Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&theme=tokyonight)
+```
+
+Para poner dos tarjetas lado a lado:
+
+```html
+<p align="center">
+  <img src="https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario" width="49%" />
+  <img src="https://readme-stats-two-rouge.vercel.app/api/card/languages?username=tu_usuario" width="49%" />
+</p>
+```
+
+> En un despliegue propio, reemplaza `readme-stats-two-rouge.vercel.app` por tu dominio.
+
+---
+
+## Personalización
+
+### Temas
+
+Usa `?theme=<nombre>`; por defecto es `dracula`. La lista completa, con sus colores, está en [`/api/themes`](https://readme-stats-two-rouge.vercel.app/api/themes).
+
+<p align="center">
+  <img src="./docs/examples/stats_dracula.svg" width="32%" />
+  <img src="./docs/examples/stats_tokyonight.svg" width="32%" />
+  <img src="./docs/examples/stats_radical.svg" width="32%" />
+</p>
+<p align="center">
+  <img src="./docs/examples/stats_github_dark.svg" width="32%" />
+  <img src="./docs/examples/stats_nord.svg" width="32%" />
+  <img src="./docs/examples/stats_gruvbox_light.svg" width="32%" />
+</p>
+
+### Colores y degradados
+
+Cualquier color que pases tiene prioridad sobre el tema, así que puedes partir de un tema y cambiar solo un color. Los valores van en hexadecimal sin `#`.
+
+```text
+&title_color=ff6e96&text_color=f8f8f2&icon_color=79dafa&bg_color=282a36&border_color=3f4258&ring_color=ff6e96
+```
+
+`bg_color` también acepta un **degradado** con el formato `ángulo,color1,color2[,…]` (de 2 a 5 colores):
+
+```text
+&bg_color=35,4158d0,c850c0,ffcc70
+```
+
+<p align="center">
+  <img src="./docs/examples/streak_gradient.svg" width="60%" alt="Racha con degradado" />
+</p>
+
+### Idioma
+
+`&locale=es` traduce títulos, etiquetas y fechas, y adapta el formato de números y fechas. Los términos técnicos (Commits, PRs, Issues) no se traducen.
+
+Idiomas disponibles: `en` · `es` · `pt` · `fr` · `de` · `it`
+
+<p align="center">
+  <img src="./docs/examples/stats_es.svg" width="60%" alt="Stats en español" />
+</p>
+
+### Contenido y forma
+
+```text
+&custom_title=Mi%20actividad&hide=issues,contribs&hide_rank=true
+```
+
+<p align="center">
+  <img src="./docs/examples/stats_custom.svg" width="49%" alt="Stats personalizada" />
+  <img src="./docs/examples/icons_off.svg" width="49%" alt="Stats sin iconos" />
+</p>
+
+`border_radius` controla el redondeo de las esquinas (de 0 a 50 px):
+
+<p align="center">
+  <img src="./docs/examples/radius_0.svg" width="32%" />
+  <img src="./docs/examples/radius_14.svg" width="32%" />
+  <img src="./docs/examples/radius_30.svg" width="32%" />
+</p>
+
+---
+
+## Referencia de parámetros
+
+**Comunes a todas las tarjetas**
+
+| Parámetro | Tipo | Descripción | Default |
+| --- | --- | --- | --- |
+| `username` | string | **Requerido.** Usuario de GitHub | — |
+| `theme` | string | Nombre del tema (ver `/api/themes`) | `dracula` |
+| `locale` | string | `en`, `es`, `pt`, `fr`, `de`, `it` | `en` |
+| `title_color` · `text_color` · `icon_color` | hex | Título, texto e iconos/acentos | según tema |
+| `bg_color` | hex o degradado | Fondo (`ángulo,color1,color2,…` para degradado) | según tema |
+| `border_color` · `ring_color` | hex | Borde y anillos de progreso | según tema |
+| `border_radius` | 0–50 | Radio de las esquinas en px | `14` |
+| `hide_border` | boolean | Oculta el borde | `false` |
+| `hide_title` | boolean | Oculta el título (stats, languages, contributions) | `false` |
+| `custom_title` | string | Título propio, máx. 60 caracteres | según tarjeta |
+
+**Específicos de cada tarjeta**
+
+| Tarjeta | Parámetro | Descripción | Default |
+| --- | --- | --- | --- |
+| `stats` | `hide` | Filas a ocultar: `stars,commits,prs,issues,contribs` | — |
+| `stats` | `hide_rank` | Oculta el anillo de rank | `false` |
+| `stats` | `hide_icons` | Oculta los iconos (alias de `show_icons=false`) | `false` |
+| `languages` | `langs_count` | Lenguajes a mostrar (1–10) | `6` |
+| `languages` | `exclude` | Lenguajes a excluir, separados por comas | — |
+| `contributions` | `days` | Días recientes a graficar (7–365) | `31` |
+
+`/api/card/all` acepta todos los parámetros anteriores y los aplica a cada tarjeta. Los valores fuera de rango se ajustan al límite y los colores que no son hexadecimales válidos se ignoran.
+
+---
+
+## Instalación local
+
+Requisitos: Node.js 18 o superior y un [token de GitHub](https://github.com/settings/tokens) con permiso `public_repo` (o `repo` para incluir repositorios privados).
 
 ```bash
-git clone <tu-fork-o-repo>
-cd README-STATS-main
+git clone https://github.com/EdgarG1013/README-STATS.git
+cd README-STATS
 npm install
-cp .env.example .env
-```
-
-Edita `.env` y agrega un [token de GitHub](https://github.com/settings/tokens) con permisos `public_repo` (o `repo` para estadísticas de repos privados):
-
-```env
-GITHUB_TOKEN=tu_token_aqui
-PORT=3000
-```
-
-Inicia el servidor:
-
-```bash
+cp .env.example .env   # añade tu GITHUB_TOKEN
 npm start
 ```
 
-El servidor queda disponible en `http://localhost:3000`. Los endpoints de la API son:
+El estudio queda en `http://localhost:3000` y la API en `/api/card/*`.
 
-```
-GET /api/card/stats?username=<usuario>
-GET /api/card/languages?username=<usuario>
-GET /api/card/streak?username=<usuario>
-GET /api/card/contributions?username=<usuario>
-GET /api/card/all?username=<usuario>
-```
-
----
-
-## 🖥️ Interfaz web (Frontend)
-
-Además de la API, el proyecto incluye un **frontend** (carpeta `ui/`) que te deja generar tus tarjetas sin tocar código ni armar URLs a mano. Puedes probarlo ya desplegado aquí:
-
-👉 **[readme-stats-two-rouge.vercel.app](https://readme-stats-two-rouge.vercel.app/)**
-
-O correrlo en local: con el servidor encendido (`npm start`), abre `http://localhost:3000` en el navegador — Express sirve automáticamente `ui/index.html`.
-
-**¿Qué puedes hacer desde ahí?**
-
-1. **GitHub Username** → escribe el usuario del que quieres generar las tarjetas.
-2. **Theme** → elige uno de los temas disponibles desde el selector (Default, Dark, Radical, Tokyo Night, One Dark, Cobalt, Gruvbox, Dracula, Monokai, Nord, Gotham, Material Palenight, GitHub Dark, Blue Navy, Aura Dark, Vision Friendly Dark, entre otros).
-3. **Pestañas de tarjeta** → cambia entre `Stats Card`, `Languages Card`, `Streak Card` y `Contributions` para previsualizar cada una.
-4. **Generate Card** → renderiza la tarjeta en vivo con los datos reales del usuario.
-5. **Copy Markdown** → copia al portapapeles el snippet `![...](...)` ya armado con tu usuario y tema, listo para pegar en tu README.
-
-Es la forma más rápida de armar la URL correcta sin memorizar los parámetros de la API — y una vez que tengas la combinación que te gusta, puedes seguir ajustándola a mano (colores, `border_radius`, `hide_icons`, etc.) usando las secciones de abajo como referencia.
-
-> Si despliegas tu propio fork en Vercel, el frontend viaja incluido: apuntará automáticamente a los endpoints `/api/card/*` de tu mismo despliegue.
+| Variable | Descripción | Default |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | Token de GitHub (requerido) | — |
+| `PAT_1`, `PAT_2`, … | Tokens adicionales que se rotan para repartir el rate limit | — |
+| `PORT` | Puerto del servidor local | `3000` |
+| `RATE_LIMIT_MAX` | Peticiones de tarjetas por IP y minuto | `60` |
 
 ---
 
-### Despliegue
+## Despliegue en Vercel
 
-El proyecto incluye `vercel.json`, así que puedes desplegarlo directamente en [Vercel](https://vercel.com) (recuerda configurar la variable de entorno `GITHUB_TOKEN` en el panel del proyecto). Una vez desplegado, reemplaza `http://localhost:3000` por tu dominio (ej. `https://readme-stats-two-rouge.vercel.app`) en todos los ejemplos de este README.
+1. Importa el repositorio en [Vercel](https://vercel.com/new). `vercel.json` ya está configurado.
+2. Añade `GITHUB_TOKEN` en **Settings → Environment Variables**.
+3. Despliega. El estudio y la API se sirven desde el mismo dominio.
 
----
-
-## 🖼️ Cómo insertar las tarjetas en tu README
-
-Simplemente agrega una imagen apuntando a tu API desplegada:
-
-```markdown
-![Mis Stats de GitHub](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario)
-```
-
-### Ejemplo: Stats Card
-
-```markdown
-![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&theme=dracula)
-```
-
-Muestra: total de estrellas, commits del último año, PRs, issues, repos a los que contribuiste, y un anillo con tu **rank** (S, A+, A, A-, B+, B, B-, C+, C).
-
-### Ejemplo: Languages Card
-
-```markdown
-![Lenguajes](https://readme-stats-two-rouge.vercel.app/api/card/languages?username=tu_usuario&theme=dracula&langs_count=6)
-```
-
-| Parámetro     | Descripción                                   | Default |
-| ------------- | ---------------------------------------------- | ------- |
-| `langs_count` | Cuántos lenguajes mostrar en la leyenda        | `6`     |
-
-### Ejemplo: Streak Card
-
-```markdown
-![Racha](https://readme-stats-two-rouge.vercel.app/api/card/streak?username=tu_usuario&theme=dracula)
-```
-
-Muestra el total de contribuciones, la racha actual (con anillo de progreso) y la racha más larga.
-
-### Ejemplo: Contribution Graph
-
-```markdown
-![Gráfica de contribuciones](https://readme-stats-two-rouge.vercel.app/api/card/contributions?username=tu_usuario&theme=dracula&days=31)
-```
-
-| Parámetro | Descripción                                | Default |
-| --------- | -------------------------------------------- | ------- |
-| `days`    | Cuántos días recientes graficar (línea/área) | `31`    |
-
-### Combinar todas las tarjetas en una sola imagen
-
-```markdown
-![GitHub Stats](https://readme-stats-two-rouge.vercel.app/api/card/all?username=tu_usuario&theme=dracula)
-```
-
-`all` apila las 4 tarjetas verticalmente en una única imagen SVG. Si prefieres organizarlas en cuadrícula (como en la vista previa de arriba), usa los endpoints individuales dentro de una tabla de Markdown/HTML:
-
-```markdown
-<table>
-  <tr>
-    <td><img src="https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario" /></td>
-    <td><img src="https://readme-stats-two-rouge.vercel.app/api/card/languages?username=tu_usuario" /></td>
-  </tr>
-</table>
-<img src="https://readme-stats-two-rouge.vercel.app/api/card/contributions?username=tu_usuario" />
-```
+> **Recomendado:** el límite de peticiones integrado vive en la memoria de cada instancia. Para un límite estricto, añade una regla de *rate limiting* en el **Vercel Firewall**.
 
 ---
 
-## 🎨 Temas (`theme`)
+## Seguridad y caché
 
-Todas las tarjetas aceptan `?theme=<nombre>`. Por defecto se usa `dracula`. Consulta la lista completa (con sus colores) en:
-
-```
-GET /api/themes
-```
-
-Algunos de los 57 temas disponibles:
-
-`default` · `dark` · `radical` · `merko` · `gruvbox` · `gruvbox_light` · `tokyonight` · `onedark` · `cobalt` · `synthwave` · `highcontrast` · `dracula` · `monokai` · `nord` · `gotham` · `github_dark` · `github_dark_dimmed` · `catppuccin_mocha` · `catppuccin_latte` · `rose_pine` · `nightowl` · `panda` · `aura` · `holi` · `neon` · `outrun` · `city_lights` · `swift` · ... [ver el resto en `api/themes.cjs`]
-
-<p align="center">
-  <img src="./docs/examples/stats_dracula.svg" width="47%" />
-  <img src="./docs/examples/stats_radical.svg" width="47%" />
-</p>
-<p align="center">
-  <img src="./docs/examples/stats_tokyonight.svg" width="47%" />
-  <img src="./docs/examples/stats_github_dark.svg" width="47%" />
-</p>
-<p align="center">
-  <img src="./docs/examples/stats_nord.svg" width="47%" />
-  <img src="./docs/examples/stats_gruvbox_light.svg" width="47%" />
-</p>
-
-### Colores personalizados
-
-Si no quieres usar un tema predefinido, puedes sobreescribir cada color manualmente (sin el símbolo `#`):
-
-```markdown
-![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&title_color=ff6e96&text_color=f8f8f2&icon_color=79dafa&bg_color=282a36&border_color=3f4258&ring_color=ff6e96)
-```
-
-| Parámetro      | Qué colorea                                                  |
-| -------------- | -------------------------------------------------------------- |
-| `title_color`  | Título de la tarjeta                                          |
-| `text_color`   | Texto general (etiquetas, valores, fechas)                    |
-| `icon_color`   | Iconos y acentos (números grandes de racha, línea de la gráfica) |
-| `bg_color`     | Fondo de la tarjeta                                            |
-| `border_color` | Borde de la tarjeta                                            |
-| `ring_color`   | Anillos de progreso (rank y racha actual)                      |
-
-Cualquier color que pases explícitamente tiene prioridad sobre el `theme` elegido — puedes usar un tema como base y sobreescribir solo un color puntual.
+- **Entradas validadas:** usuario, colores, números y textos se validan y escapan antes de llegar al SVG.
+- **CSP estricta:** cada tarjeta se sirve con una política que impide ejecutar scripts, y el estudio no se puede incrustar en otros sitios.
+- **Errores limpios:** respuestas `400`, `404`, `429`, `502` o `503`, sin detalles internos.
+- **Caché:** 30 min en el navegador y 4 h en la CDN de Vercel; además, una caché en memoria de 10 min y deduplicación de peticiones simultáneas. Las visitas a tu README no gastan el token.
+- **GitHub API:** timeout de 10 s, rotación de tokens y ningún reintento cuando el usuario no existe.
 
 ---
 
-## 🔘 `border_radius`
+## Estructura del proyecto
 
-Controla el redondeo de las esquinas de la tarjeta (en píxeles). Por defecto es `14`.
-
-```markdown
-![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&border_radius=0)
-![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&border_radius=14)
-![Stats](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&border_radius=30)
-```
-
-<p align="center">
-  <img src="./docs/examples/radius_0.svg" width="30%" />
-  <img src="./docs/examples/radius_14.svg" width="30%" />
-  <img src="./docs/examples/radius_30.svg" width="30%" />
-</p>
-
-Funciona igual en las 4 tarjetas (`stats`, `languages`, `streak`, `contributions`).
-
----
-
-## 🖼️ Activar o desactivar iconos (`hide_icons`)
-
-La Stats Card incluye un pequeño ícono junto a cada fila (⭐ estrellas, commits, PRs, issues, contribuciones). Puedes ocultarlos con `hide_icons=true`:
-
-```markdown
-![Stats con iconos](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&hide_icons=false)
-![Stats sin iconos](https://readme-stats-two-rouge.vercel.app/api/card/stats?username=tu_usuario&hide_icons=true)
-```
-
-<p align="center">
-  <img src="./docs/examples/icons_on.svg" width="47%" />
-  <img src="./docs/examples/icons_off.svg" width="47%" />
-</p>
-
----
-
-## ⚙️ Referencia completa de parámetros
-
-Parámetros comunes a **todas** las tarjetas:
-
-| Parámetro       | Tipo    | Descripción                                             | Default     |
-| --------------- | ------- | -------------------------------------------------------- | ----------- |
-| `username`      | string  | **Requerido.** Usuario de GitHub                         | —           |
-| `theme`         | string  | Nombre del tema (ver `/api/themes`)                       | `dracula`   |
-| `title_color`   | hex     | Color del título (sin `#`)                                | según tema  |
-| `text_color`    | hex     | Color del texto                                           | según tema  |
-| `icon_color`    | hex     | Color de iconos/acentos                                   | según tema  |
-| `bg_color`      | hex     | Color de fondo                                             | según tema  |
-| `border_color`  | hex     | Color del borde                                            | según tema  |
-| `ring_color`    | hex     | Color de los anillos de progreso                           | según tema  |
-| `border_radius` | número  | Radio de las esquinas en px (0–50)                         | `14`        |
-| `hide_border`   | boolean | `true` para ocultar el borde                               | `false`     |
-| `hide_title`    | boolean | `true` para ocultar el título (stats, languages, contributions) | `false` |
-| `custom_title`  | string  | Título propio (máx. 60 caracteres)                         | según tarjeta |
-| `locale`        | string  | Idioma de los textos: `en`, `es`, `pt`, `fr`, `de`, `it` (Commits, PRs e Issues no se traducen) | `en` |
-
-`bg_color` también acepta un **degradado** con el formato `ángulo,color1,color2[,…]` (de 2 a 5 colores), por ejemplo `bg_color=35,4158d0,c850c0,ffcc70`.
-
-Parámetros específicos:
-
-| Endpoint                | Parámetro     | Descripción                                    | Default |
-| ------------------------ | ------------- | ------------------------------------------------ | ------- |
-| `/api/card/stats`        | `hide_icons`  | `true` para ocultar los iconos (alias: `show_icons=false`) | `false` |
-| `/api/card/stats`        | `hide_rank`   | `true` para ocultar el anillo de rank             | `false` |
-| `/api/card/stats`        | `hide`        | Filas a ocultar: `stars,commits,prs,issues,contribs` | —    |
-| `/api/card/languages`    | `langs_count` | Cantidad de lenguajes a mostrar (1–10)            | `6`     |
-| `/api/card/languages`    | `exclude`     | Lenguajes a excluir, separados por comas (ej. `html,css`) | — |
-| `/api/card/contributions`| `days`        | Cantidad de días recientes a graficar (7–365)     | `31`    |
-
-Los valores fuera de rango se ajustan al límite y los colores que no son hexadecimales válidos se ignoran.
-
-### 🔒 Seguridad y caché
-
-- Todos los parámetros se validan antes de llegar al SVG, y las tarjetas se sirven con una CSP que impide ejecutar scripts.
-- Las tarjetas se cachean en el navegador (30 min) y en la CDN de Vercel (4 h), así cada visita al README no consume el token de GitHub.
-- Límite de **60 peticiones por minuto por IP** (configurable con `RATE_LIMIT_MAX`). Es por instancia; para un límite estricto en producción añade una regla de *rate limiting* en el **Vercel Firewall**.
-
----
-
-## 🧠 Cómo se calcula el rank
-
-El anillo de la Stats Card (S, A+, A, A-, B+, B, B-, C+, C) se calcula con un puntaje ponderado sobre: commits del último año, pull requests, issues, estrellas totales y repos a los que contribuiste — cuanto mejor el percentil, más alto el rango. La lógica vive en `api/cards/stats.cjs` (`calculateRank`) y puedes ajustar los pesos ahí si quieres una escala distinta.
-
----
-
-## 📁 Estructura del proyecto
-
-```
+```text
 api/
-  index.js            → Rutas Express (/api/card/*)
-  card.js              → Fetch de datos desde la API de GitHub
-  github.js            → Cliente GraphQL/REST de GitHub
-  themes.cjs            → Definición de los 57 temas
+  index.js             Rutas Express, cabeceras de seguridad, caché y rate limit
+  options.js           Validación y normalización de los parámetros
+  card.js              Consultas GraphQL a GitHub y cálculo de rachas
+  themes.cjs           Temas usados por los renderers
   cards/
-    stats.cjs            → Tarjeta de estadísticas + rank
-    languages.cjs         → Tarjeta de lenguajes más usados
-    streak.cjs             → Tarjeta de racha de contribuciones
-    contributions.cjs       → Gráfica de contribuciones
-ui/                    → Frontend simple para generar tus tarjetas visualmente
-docs/examples/         → SVGs de ejemplo usados en este README
+    stats.cjs          Tarjeta de estadísticas + rank
+    languages.cjs      Lenguajes más usados
+    streak.cjs         Racha de contribuciones
+    contributions.cjs  Gráfica de actividad
+    common.cjs         Colores, fondo/degradado, borde y título compartidos
+    i18n.cjs           Traducciones de las tarjetas
+src/themes/            Catálogo adicional de temas
+ui/                    Estudio web (HTML, CSS y JS sin dependencias)
+docs/                  GIF de la demo y SVG de ejemplo
 ```
 
 ---
 
-## 🛠️ Solución de problemas
+## Solución de problemas
 
-- **"Missing username parameter"** → agrega `?username=tu_usuario` a la URL.
-- **Rate limit / 401** → revisa que `GITHUB_TOKEN` esté configurado en `.env` (o en las variables de entorno de tu despliegue) y que el token no haya expirado.
-- **Las imágenes no se actualizan en GitHub** → GitHub cachea las imágenes de los README; agrega un parámetro random (`&cache=123`) o espera unos minutos.
+| Problema | Solución |
+| --- | --- |
+| `Missing username parameter` | Añade `?username=tu_usuario` a la URL. |
+| `GitHub token not configured` | Define `GITHUB_TOKEN` en `.env` o en las variables de Vercel. |
+| `503` / rate limit de GitHub | Añade más tokens (`PAT_1`, `PAT_2`, …) o espera a que se reinicie el límite. |
+| La tarjeta no se actualiza en GitHub | GitHub cachea las imágenes; espera unos minutos o añade un parámetro como `&v=2`. |
 
 ---
 
-## 📄 Licencia
+## Licencia
 
-Este proyecto está pensado como una plantilla personal inspirada en [github-readme-stats](https://github.com/anuraghazra/github-readme-stats). Úsalo y modifícalo libremente para tu propio perfil.
+[MIT](./LICENSE). Inspirado en [github-readme-stats](https://github.com/anuraghazra/github-readme-stats), [github-readme-streak-stats](https://github.com/DenverCoder1/github-readme-streak-stats) y [github-readme-activity-graph](https://github.com/Ashutosh00710/github-readme-activity-graph).

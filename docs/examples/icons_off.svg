@@ -25,42 +25,43 @@
     }
   </style>
 
-  <rect x="0" y="0" rx="14" width="495" height="220"
-    fill="#282a36" stroke="#6272a4" stroke-width="1" />
+  
+  <rect x="0.5" y="0.5" rx="14" width="494" height="219"
+    fill="#282a36" stroke="#6272a4" stroke-opacity="1" stroke-width="1" />
 
-  <text data-testid="card-title" x="25" y="35" class="header">Edgar Garcia's GitHub Stats</text>
+  <text data-testid="card-title" x="25" y="35" class="header">Edgar Garcia&apos;s GitHub Stats</text>
 
   
       <g transform="translate(25, 0)">
         
         <text class="stat" x="0" y="80">Total Stars Earned:</text>
-        <text class="stat" x="255" y="80">0</text>
+        <text class="stat" x="235" y="80">3</text>
       </g>
       <g transform="translate(25, 0)">
         
         <text class="stat" x="0" y="105">Total Commits (last year):</text>
-        <text class="stat" x="255" y="105">153</text>
+        <text class="stat" x="235" y="105">712</text>
       </g>
       <g transform="translate(25, 0)">
         
         <text class="stat" x="0" y="130">Total PRs:</text>
-        <text class="stat" x="255" y="130">10</text>
+        <text class="stat" x="235" y="130">87</text>
       </g>
       <g transform="translate(25, 0)">
         
         <text class="stat" x="0" y="155">Total Issues:</text>
-        <text class="stat" x="255" y="155">0</text>
+        <text class="stat" x="235" y="155">0</text>
       </g>
       <g transform="translate(25, 0)">
         
         <text class="stat" x="0" y="180">Contributed to (last year):</text>
-        <text class="stat" x="255" y="180">2</text>
+        <text class="stat" x="235" y="180">7</text>
       </g>
 
   <g transform="translate(420, 117.5)">
     <circle cx="0" cy="0" r="40" fill="none" class="rank-circle-rim"/>
     <circle cx="0" cy="0" r="40" fill="none" class="rank-circle"
-      stroke-dashoffset="228.83622438262526" transform="rotate(-90)"/>
-    <text data-testid="rank-text" x="0" y="8" class="rank-text" text-anchor="middle">C</text>
+      stroke-dashoffset="161.5610161986523" transform="rotate(-90)"/>
+    <text data-testid="rank-text" x="0" y="8" class="rank-text" text-anchor="middle">B-</text>
   </g>
 </svg>

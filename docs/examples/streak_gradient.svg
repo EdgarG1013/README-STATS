@@ -1,0 +1,50 @@
+<svg width="495" height="195" viewBox="0 0 495 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .stat-big { font: 700 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: #ffffff; }
+    .stat-label { font: 400 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: #ffffff; }
+    .stat-date { font: 400 12px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: #ffffff; opacity: 0.85; }
+    .streak-num { font: 700 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: #ffffff; }
+    .streak-label { font: 400 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: #ffffff; }
+  </style>
+
+  <defs>
+    <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Cuts a gap in the ring behind the flame, so it works on solid and gradient backgrounds -->
+    <mask id="ringMask">
+      <rect width="495" height="195" fill="white"/>
+      <circle cx="247.5" cy="31" r="13" fill="black"/>
+    </mask>
+  </defs>
+
+  <defs><linearGradient id="cardBg" gradientTransform="rotate(35 0.5 0.5)"><stop offset="0%" stop-color="#4158d0"/><stop offset="50%" stop-color="#c850c0"/><stop offset="100%" stop-color="#ffcc70"/></linearGradient></defs>
+  <rect x="0.5" y="0.5" rx="14" width="494" height="194"
+    fill="url(#cardBg)" stroke="#e4e2e2" stroke-opacity="1" stroke-width="1" />
+
+  <line x1="165" y1="28" x2="165" y2="167" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1"/>
+  <line x1="330" y1="28" x2="330" y2="167" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1"/>
+
+  
+  <g transform="translate(82.5, 0)">
+    <text x="0" y="88" class="stat-big" text-anchor="middle">822</text>
+    <text x="0" y="122" class="stat-label" text-anchor="middle">Total Contributions</text>
+    <text x="0" y="148" class="stat-date" text-anchor="middle">Nov 2, 2025 - Present</text>
+  </g>
+
+  <g mask="url(#ringMask)">
+    <circle cx="247.5" cy="71" r="40" stroke="#ffffff" stroke-width="5" fill="none" filter="url(#ringGlow)"/>
+  </g>
+  <path transform="translate(247.5, 31)" d="M 1.5 -10.33 C 1.5 -10.33 2.24 -7.68 2.24 -5.53 C 2.24 -3.47 0.89 -1.8 -1.17 -1.8 C -3.23 -1.8 -4.79 -3.47 -4.79 -5.53 L -4.76 -5.89 C -6.78 -3.49 -8 -0.38 -8 3 C -8 7.42 -4.42 11 0 11 C 4.42 11 8 7.42 8 3 C 8 -2.39 5.41 -7.2 1.5 -10.33 Z M -0.29 8 C -2.07 8 -3.51 6.6 -3.51 4.86 C -3.51 3.24 -2.46 2.1 -0.7 1.74 C 1.07 1.38 2.9 0.53 3.92 -0.84 C 4.31 0.45 4.51 1.81 4.51 3.2 C 4.51 5.85 2.36 8 -0.29 8 Z" fill="#ffffff" filter="url(#ringGlow)"/>
+  <text x="247.5" y="81" class="streak-num" text-anchor="middle">70</text>
+  <text x="247.5" y="136" class="streak-label" text-anchor="middle">Current Streak</text>
+  <text x="247.5" y="159" class="stat-date" text-anchor="middle">Aug 12 - Oct 20</text>
+
+  
+  <g transform="translate(412.5, 0)">
+    <text x="0" y="88" class="stat-big" text-anchor="middle">70</text>
+    <text x="0" y="122" class="stat-label" text-anchor="middle">Longest Streak</text>
+    <text x="0" y="148" class="stat-date" text-anchor="middle">Aug 12 - Oct 20</text>
+  </g>
+</svg>
