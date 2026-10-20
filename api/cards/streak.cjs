@@ -1,15 +1,7 @@
-const { getCardColors } = require('../themes.cjs');
+const { resolveColors, cardFrame } = require('./common.cjs');
 
 function renderStreakCard(streakData, theme) {
-  const colors = getCardColors({
-    title_color: theme.title_color,
-    text_color: theme.text_color,
-    icon_color: theme.icon_color,
-    bg_color: theme.bg_color,
-    border_color: theme.border_color,
-    ring_color: theme.ring_color,
-    theme: theme.themeName,
-  });
+  const colors = resolveColors(theme);
 
   const {
     totalContributions,
@@ -40,7 +32,6 @@ function renderStreakCard(streakData, theme) {
 
   const width = 495;
   const height = 195;
-  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
   const paddingX = 25;
   const paddingY = 30;
 
@@ -88,15 +79,14 @@ function renderStreakCard(streakData, theme) {
     }
   </style>
 
-  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
-    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
+  ${cardFrame({ width, height, colors, theme })}
 
   <!-- Divider lines -->
   <line x1="${col2X - 50}" y1="${dividerTop}" x2="${col2X - 50}" y2="${dividerBottom}" stroke="${colors.borderColor}" stroke-width="1"/>
   <line x1="${col2X + 50}" y1="${dividerTop}" x2="${col2X + 50}" y2="${dividerBottom}" stroke="${colors.borderColor}" stroke-width="1"/>
 
   <!-- Total Contributions -->
-  <text x="${col1X}" y="${paddingY + 45}" class="stat-big" text-anchor="middle">${totalContributions.toLocaleString()}</text>
+  <text x="${col1X}" y="${paddingY + 45}" class="stat-big" text-anchor="middle">${Number(totalContributions).toLocaleString()}</text>
   <text x="${col1X}" y="${paddingY + 70}" class="stat-label" text-anchor="middle">Total Contributions</text>
   <text x="${col1X}" y="${paddingY + 88}" class="stat-date" text-anchor="middle">${totalRange}</text>
 

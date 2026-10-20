@@ -1,4 +1,4 @@
-const { getCardColors } = require('../themes.cjs');
+const { escapeXml, resolveColors, cardFrame, cardTitle } = require('./common.cjs');
 
 const langColors = {
   TypeScript: '#3178c6',
@@ -32,28 +32,18 @@ const defaultBarColors = [
 ];
 
 function renderLanguagesCard(languages, theme) {
-  const colors = getCardColors({
-    title_color: theme.title_color,
-    text_color: theme.text_color,
-    icon_color: theme.icon_color,
-    bg_color: theme.bg_color,
-    border_color: theme.border_color,
-    ring_color: theme.ring_color,
-    theme: theme.themeName,
-  });
+  const colors = resolveColors(theme);
 
   const width = 495;
-  const height = 194;
-  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
   const paddingX = 25;
-  const paddingY = 35;
+  const paddingY = theme.hide_title ? 0 : 35;
 
   const barHeight = 14;
   const barWidth = width - paddingX * 2;
   const barY = paddingY + 26;
   const barRadius = 7;
 
-  const total = languages.reduce((s, l) => s + l.size, 0);
+  const total = languages.reduce((s, l) => s + l.size, 0) || 1;
 
   let barSegments = '';
   let offsetX = 0;
@@ -76,6 +66,8 @@ function renderLanguagesCard(languages, theme) {
   const cols = 2;
   const colWidth = (width - paddingX * 2) / cols;
   const legendStartY = barY + barHeight + 22;
+  const legendRows = Math.max(Math.ceil(languages.length / cols), 1);
+  const height = legendStartY + (legendRows - 1) * 24 + 26;
 
   for (let i = 0; i < languages.length; i++) {
     const lang = languages[i];
@@ -88,7 +80,7 @@ function renderLanguagesCard(languages, theme) {
 
     legendItems += `
     <circle cx="${lx + 5}" cy="${ly - 4}" r="5" fill="${color}"/>
-    <text data-testid="lang-name" x="${lx + 18}" y="${ly}" class="lang-name">${lang.name} ${pct}%</text>`;
+    <text data-testid="lang-name" x="${lx + 18}" y="${ly}" class="lang-name">${escapeXml(lang.name)} ${pct}%</text>`;
   }
 
   const svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -103,10 +95,9 @@ function renderLanguagesCard(languages, theme) {
     }
   </style>
 
-  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
-    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
+  ${cardFrame({ width, height, colors, theme })}
 
-  <text data-testid="card-title" x="${paddingX}" y="${paddingY}" class="header">Most Used Languages</text>
+  ${cardTitle('Most Used Languages', theme, `x="${paddingX}" y="${paddingY}"`)}
 
   ${barMask}
   <g mask="url(#barMask)">

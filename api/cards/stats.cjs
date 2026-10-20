@@ -1,4 +1,4 @@
-const { getCardColors } = require('../themes.cjs');
+const { escapeXml, resolveColors, cardFrame, cardTitle } = require('./common.cjs');
 
 function calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contributedTo }) {
   const COMMITS_MEDIAN = 1000;
@@ -42,24 +42,18 @@ function calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contri
 function renderStatsCard(data, theme) {
   const { name, totalStars, totalCommits, totalPRs, totalIssues, contributedTo } = data;
 
-  const colors = getCardColors({
-    title_color: theme.title_color,
-    text_color: theme.text_color,
-    icon_color: theme.icon_color,
-    bg_color: theme.bg_color,
-    border_color: theme.border_color,
-    ring_color: theme.ring_color,
-    theme: theme.themeName,
-  });
+  const colors = resolveColors(theme);
 
   const rank = calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contributedTo });
 
   const width = 495;
-  const height = 220;
   const paddingX = 25;
-  const paddingY = 35;
   const lineH = 25;
-  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
+  // Without a title the rows move up into the space the header used.
+  const paddingY = theme.hide_title ? 10 : 35;
+  const showIcons = theme.show_icons !== false;
+  const showRank = !theme.hide_rank;
+  const hidden = new Set(theme.hide || []);
 
   const iconColor = colors.iconColor;
 
@@ -72,21 +66,22 @@ function renderStatsCard(data, theme) {
   ];
 
   const rows = [
-    ['Total Stars Earned:', totalStars],
-    ['Total Commits (last year):', totalCommits],
-    ['Total PRs:', totalPRs],
-    ['Total Issues:', totalIssues],
-    ['Contributed to (last year):', contributedTo],
-  ];
+    ['stars', 'Total Stars Earned:', totalStars, icons[0]],
+    ['commits', 'Total Commits (last year):', totalCommits, icons[1]],
+    ['prs', 'Total PRs:', totalPRs, icons[2]],
+    ['issues', 'Total Issues:', totalIssues, icons[3]],
+    ['contribs', 'Contributed to (last year):', contributedTo, icons[4]],
+  ].filter(([key]) => !hidden.has(key));
 
   const rowsSvg = rows
-    .map(([label, value], i) => {
+    .map(([, label, value, icon], i) => {
       const y = paddingY + 20 + (i + 1) * lineH;
+      const textX = showIcons ? 20 : 0;
       return `
       <g transform="translate(${paddingX}, 0)">
-        <g transform="translate(0, ${y - 11})">${icons[i]}</g>
-        <text class="stat" x="20" y="${y}">${label}</text>
-        <text class="stat" x="255" y="${y}">${Number(value).toLocaleString()}</text>
+        ${showIcons ? `<g transform="translate(0, ${y - 11})">${icon}</g>` : ''}
+        <text class="stat" x="${textX}" y="${y}">${label}</text>
+        <text class="stat" x="${textX + 235}" y="${y}">${Number(value).toLocaleString()}</text>
       </g>`;
     })
     .join('');
@@ -95,7 +90,12 @@ function renderStatsCard(data, theme) {
   const circumference = 2 * Math.PI * ringRadius;
   const ringOffset = circumference * (1 - rank.percentage);
   const ringX = width - paddingX - ringRadius - 10;
-  const ringY = paddingY + 20 + (rows.length * lineH) / 2;
+  const ringY = paddingY + 20 + (Math.max(rows.length, 1) * lineH) / 2;
+  const height = Math.max(
+    paddingY + 20 + rows.length * lineH + 40,
+    showRank ? ringY + ringRadius + 25 : 0,
+    90,
+  );
 
   const svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
   <style>
@@ -124,31 +124,21 @@ function renderStatsCard(data, theme) {
     }
   </style>
 
-  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
-    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
+  ${cardFrame({ width, height, colors, theme })}
 
-  <text data-testid="card-title" x="${paddingX}" y="${paddingY}" class="header">${escapeXml(name)}'s GitHub Stats</text>
+  ${cardTitle(`${name}'s GitHub Stats`, theme, `x="${paddingX}" y="${paddingY}"`)}
 
   ${rowsSvg}
 
-  <g transform="translate(${ringX}, ${ringY})">
+  ${showRank ? `<g transform="translate(${ringX}, ${ringY})">
     <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle-rim"/>
     <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle"
       stroke-dashoffset="${ringOffset}" transform="rotate(-90)"/>
     <text data-testid="rank-text" x="0" y="8" class="rank-text" text-anchor="middle">${rank.level}</text>
-  </g>
+  </g>` : ''}
 </svg>`;
 
   return svg;
-}
-
-function escapeXml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
 }
 
 module.exports = { renderStatsCard };

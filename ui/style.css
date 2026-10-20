@@ -182,22 +182,23 @@ a { color: inherit; }
   padding: 0 var(--gutter) 48px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
-  grid-template-areas:
-    "tabs    controls"
-    "preview controls"
-    "code    controls";
-  grid-template-rows: auto auto 1fr;
+  grid-template-areas: "stage controls";
   gap: 16px 24px;
   align-items: start;
 }
 
 .stage-tabs   { grid-area: tabs; }
+/* Desktop: card picker, preview and code stay in view while the (taller) option panels scroll. */
+.stage {
+  grid-area: stage;
+  position: sticky; top: 16px;
+  display: flex; flex-direction: column; gap: 16px;
+}
 .preview-card { grid-area: preview; }
 .controls     { grid-area: controls; }
 .code-section { grid-area: code; }
 
 .controls {
-  position: sticky; top: 16px;
   display: flex; flex-direction: column; gap: 16px;
 }
 
@@ -439,7 +440,10 @@ input[type="range"] {
   -webkit-appearance: none; appearance: none;
   width: 100%; height: 20px; background: none; cursor: pointer;
 }
-input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--surface-3); }
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 4px;
+  background: linear-gradient(to right, var(--accent) var(--fill, 0%), var(--surface-3) var(--fill, 0%));
+}
 input[type="range"]::-moz-range-track { height: 4px; border-radius: 4px; background: var(--surface-3); }
 input[type="range"]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
 input[type="range"]::-webkit-slider-thumb {
@@ -449,6 +453,71 @@ input[type="range"]::-webkit-slider-thumb {
 }
 input[type="range"]::-moz-range-thumb {
   width: 12px; height: 12px; border: 3px solid var(--ink); border-radius: 50%; background: var(--accent);
+}
+
+/* Text inputs */
+.text-field { display: flex; flex-direction: column; gap: 6px; }
+.text-field label, .chip-group legend { font-size: 13px; color: var(--text-dim); }
+.text-field input {
+  padding: 9px 10px;
+  border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--ink);
+  font-size: 13px; outline: none;
+  transition: border-color 0.2s;
+}
+.text-field input::placeholder { color: var(--text-faint); }
+.text-field input:focus { border-color: var(--accent); }
+
+/* Switches */
+.switches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+
+.switch {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text-dim); cursor: pointer; user-select: none;
+}
+.switches .switch {
+  padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--ink);
+}
+.switch input {
+  -webkit-appearance: none; appearance: none; flex: none;
+  position: relative; width: 28px; height: 16px; margin: 0;
+  border-radius: 999px; background: var(--surface-3);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  cursor: pointer; transition: background 0.2s;
+}
+.switch input::after {
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 10px; height: 10px; border-radius: 50%; background: var(--text-dim);
+  transition: transform 0.2s var(--ease), background 0.2s;
+}
+.switch input:checked { background: var(--accent); box-shadow: none; }
+.switch input:checked::after { transform: translateX(12px); background: var(--accent-ink); }
+.switch:has(input:checked) { color: var(--text); }
+
+/* Stat row chips */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; border: none; }
+.chip-group legend { margin-bottom: 8px; }
+.toggle-chip { cursor: pointer; }
+.toggle-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle-chip span {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--ink);
+  font-size: 12px; color: var(--text-faint);
+  text-decoration: line-through; text-decoration-color: var(--text-faint);
+  transition: all 0.15s;
+}
+.toggle-chip input:checked + span {
+  border-color: rgba(182, 243, 106, 0.45); background: var(--accent-soft);
+  color: var(--text); text-decoration: none;
+}
+.toggle-chip input:checked + span::before { content: "✓"; color: var(--accent); font-weight: 700; }
+.toggle-chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Gradient */
+.gradient-fields {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 12px;
+  padding: 10px; border: 1px dashed var(--line-strong); border-radius: var(--r-sm);
 }
 
 /* ---------- Code ---------- */
@@ -508,13 +577,13 @@ footer a:hover { color: var(--accent); }
 
 /* ---------- Page load ---------- */
 
-.hero > *, .workspace > * { animation: rise 0.6s var(--ease) both; }
+.hero > *, .stage > *, .controls { animation: rise 0.6s var(--ease) both; }
 .hero > :nth-child(2) { animation-delay: 0.05s; }
 .hero > :nth-child(3) { animation-delay: 0.1s; }
 .hero > :nth-child(4) { animation-delay: 0.15s; }
-.workspace > :nth-child(1) { animation-delay: 0.18s; }
-.workspace > :nth-child(2) { animation-delay: 0.24s; }
-.workspace > :nth-child(3) { animation-delay: 0.3s; }
+.stage > :nth-child(1) { animation-delay: 0.18s; }
+.stage > :nth-child(2) { animation-delay: 0.24s; }
+.controls { animation-delay: 0.3s; }
 
 /* ---------- Responsive ---------- */
 
@@ -522,9 +591,11 @@ footer a:hover { color: var(--accent); }
   .workspace {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "tabs" "preview" "controls" "code";
+    gap: 16px;
     grid-template-rows: auto;
   }
-  .controls { position: static; display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+  .stage { display: contents; }
+  .controls { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
 }
 
 @media (max-width: 680px) {
@@ -544,6 +615,7 @@ footer a:hover { color: var(--accent); }
   .code-body { flex-direction: column; align-items: stretch; }
   .copy-btn { width: 100%; }
   .color-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gradient-fields { grid-template-columns: minmax(0, 1fr); }
   .bg-opt { padding: 4px 8px; }
 }
 

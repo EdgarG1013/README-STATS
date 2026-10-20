@@ -248,15 +248,31 @@ Parámetros comunes a **todas** las tarjetas:
 | `bg_color`      | hex     | Color de fondo                                             | según tema  |
 | `border_color`  | hex     | Color del borde                                            | según tema  |
 | `ring_color`    | hex     | Color de los anillos de progreso                           | según tema  |
-| `border_radius` | número  | Radio de las esquinas en px                                | `14`        |
+| `border_radius` | número  | Radio de las esquinas en px (0–50)                         | `14`        |
+| `hide_border`   | boolean | `true` para ocultar el borde                               | `false`     |
+| `hide_title`    | boolean | `true` para ocultar el título (stats, languages, contributions) | `false` |
+| `custom_title`  | string  | Título propio (máx. 60 caracteres)                         | según tarjeta |
+
+`bg_color` también acepta un **degradado** con el formato `ángulo,color1,color2[,…]` (de 2 a 5 colores), por ejemplo `bg_color=35,4158d0,c850c0,ffcc70`.
 
 Parámetros específicos:
 
 | Endpoint                | Parámetro     | Descripción                                    | Default |
 | ------------------------ | ------------- | ------------------------------------------------ | ------- |
-| `/api/card/stats`        | `hide_icons`  | `true` para ocultar los iconos de cada fila       | `false` |
-| `/api/card/languages`    | `langs_count` | Cantidad de lenguajes a mostrar                   | `6`     |
-| `/api/card/contributions`| `days`        | Cantidad de días recientes a graficar             | `31`    |
+| `/api/card/stats`        | `hide_icons`  | `true` para ocultar los iconos (alias: `show_icons=false`) | `false` |
+| `/api/card/stats`        | `hide_rank`   | `true` para ocultar el anillo de rank             | `false` |
+| `/api/card/stats`        | `hide`        | Filas a ocultar: `stars,commits,prs,issues,contribs` | —    |
+| `/api/card/languages`    | `langs_count` | Cantidad de lenguajes a mostrar (1–10)            | `6`     |
+| `/api/card/languages`    | `exclude`     | Lenguajes a excluir, separados por comas (ej. `html,css`) | — |
+| `/api/card/contributions`| `days`        | Cantidad de días recientes a graficar (7–365)     | `31`    |
+
+Los valores fuera de rango se ajustan al límite y los colores que no son hexadecimales válidos se ignoran.
+
+### 🔒 Seguridad y caché
+
+- Todos los parámetros se validan antes de llegar al SVG, y las tarjetas se sirven con una CSP que impide ejecutar scripts.
+- Las tarjetas se cachean en el navegador (30 min) y en la CDN de Vercel (4 h), así cada visita al README no consume el token de GitHub.
+- Límite de **60 peticiones por minuto por IP** (configurable con `RATE_LIMIT_MAX`). Es por instancia; para un límite estricto en producción añade una regla de *rate limiting* en el **Vercel Firewall**.
 
 ---
 

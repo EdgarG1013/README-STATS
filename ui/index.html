@@ -42,6 +42,7 @@
   </section>
 
   <main class="workspace">
+    <div class="stage">
     <div class="stage-tabs">
       <span class="step-label"><b>01</b> Tarjeta</span>
       <div class="tabs" role="tablist" aria-label="Tipo de tarjeta">
@@ -64,54 +65,9 @@
       <div class="preview-body" id="preview-body"></div>
     </section>
 
-    <aside class="controls">
-      <section class="panel">
-        <div class="panel-head">
-          <span class="step-label"><b>02</b> Tema</span>
-          <span class="theme-current" id="theme-current">dracula</span>
-        </div>
-        <div class="search">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
-          <input type="search" id="theme-search" placeholder="Buscar entre los temas…" aria-label="Buscar tema" />
-        </div>
-        <div class="theme-grid" id="theme-grid" role="listbox" aria-label="Temas"></div>
-      </section>
-
-      <section class="panel" id="customize">
-        <div class="panel-head">
-          <span class="step-label"><b>03</b> Ajustes</span>
-          <button type="button" class="link-btn" id="reset-btn">Restablecer colores</button>
-        </div>
-
-        <div class="color-grid">
-          <label class="color-field"><input type="color" data-param="title_color" /><span>Título</span></label>
-          <label class="color-field"><input type="color" data-param="text_color" /><span>Texto</span></label>
-          <label class="color-field"><input type="color" data-param="icon_color" /><span>Iconos</span></label>
-          <label class="color-field"><input type="color" data-param="bg_color" /><span>Fondo</span></label>
-          <label class="color-field"><input type="color" data-param="border_color" /><span>Borde</span></label>
-          <label class="color-field"><input type="color" data-param="ring_color" /><span>Anillo</span></label>
-        </div>
-
-        <div class="range-field">
-          <div class="range-head"><label for="border_radius">Radio del borde</label><output id="border_radius-value">14</output></div>
-          <input type="range" id="border_radius" min="0" max="30" value="14" />
-        </div>
-
-        <div class="range-field" data-only="languages all">
-          <div class="range-head"><label for="langs_count">Lenguajes a mostrar</label><output id="langs_count-value">6</output></div>
-          <input type="range" id="langs_count" min="1" max="10" value="6" />
-        </div>
-
-        <div class="range-field" data-only="contributions all">
-          <div class="range-head"><label for="days">Días de actividad</label><output id="days-value">31</output></div>
-          <input type="range" id="days" min="7" max="365" value="31" />
-        </div>
-      </section>
-    </aside>
-
     <section class="code-section" id="code-section" hidden>
       <div class="code-header">
-        <span class="step-label"><b>04</b> Copiar</span>
+        <span class="step-label"><b>05</b> Copiar</span>
         <div class="format-tabs" role="tablist" aria-label="Formato">
           <button class="format-tab active" data-format="markdown">Markdown</button>
           <button class="format-tab" data-format="html">HTML</button>
@@ -126,6 +82,94 @@
         </button>
       </div>
     </section>
+    </div>
+
+    <aside class="controls">
+      <section class="panel">
+        <div class="panel-head">
+          <span class="step-label"><b>02</b> Tema</span>
+          <span class="theme-current" id="theme-current">dracula</span>
+        </div>
+        <div class="search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+          <input type="search" id="theme-search" placeholder="Buscar entre los temas…" aria-label="Buscar tema" />
+        </div>
+        <div class="theme-grid" id="theme-grid" role="listbox" aria-label="Temas"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <span class="step-label"><b>03</b> Contenido</span>
+        </div>
+
+        <div class="text-field" data-only="stats languages contributions">
+          <label for="custom_title">Título personalizado</label>
+          <input type="text" id="custom_title" data-param="custom_title" maxlength="60" placeholder="Por defecto según la tarjeta" />
+        </div>
+
+        <div class="switches">
+          <label class="switch" data-only="stats languages contributions all"><input type="checkbox" data-param="hide_title" /><span>Ocultar título</span></label>
+          <label class="switch"><input type="checkbox" data-param="hide_border" /><span>Ocultar borde</span></label>
+          <label class="switch" data-only="stats all"><input type="checkbox" data-param="show_icons" data-invert /><span>Ocultar iconos</span></label>
+          <label class="switch" data-only="stats all"><input type="checkbox" data-param="hide_rank" /><span>Ocultar rango</span></label>
+        </div>
+
+        <fieldset class="chip-group" data-only="stats all">
+          <legend>Estadísticas visibles</legend>
+          <label class="toggle-chip"><input type="checkbox" data-hide="stars" checked /><span>Estrellas</span></label>
+          <label class="toggle-chip"><input type="checkbox" data-hide="commits" checked /><span>Commits</span></label>
+          <label class="toggle-chip"><input type="checkbox" data-hide="prs" checked /><span>PRs</span></label>
+          <label class="toggle-chip"><input type="checkbox" data-hide="issues" checked /><span>Issues</span></label>
+          <label class="toggle-chip"><input type="checkbox" data-hide="contribs" checked /><span>Contribuciones</span></label>
+        </fieldset>
+
+        <div class="range-field" data-only="languages all">
+          <div class="range-head"><label for="langs_count">Lenguajes a mostrar</label><output for="langs_count">6</output></div>
+          <input type="range" id="langs_count" data-param="langs_count" data-default="6" min="1" max="10" value="6" />
+        </div>
+
+        <div class="text-field" data-only="languages all">
+          <label for="exclude">Excluir lenguajes</label>
+          <input type="text" id="exclude" data-param="exclude" maxlength="200" placeholder="ej. html, css, jupyter notebook" />
+        </div>
+
+        <div class="range-field" data-only="contributions all">
+          <div class="range-head"><label for="days">Días de actividad</label><output for="days">31</output></div>
+          <input type="range" id="days" data-param="days" data-default="31" min="7" max="365" value="31" />
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <span class="step-label"><b>04</b> Estilo</span>
+          <button type="button" class="link-btn" id="reset-btn">Restablecer</button>
+        </div>
+
+        <div class="color-grid">
+          <label class="color-field"><input type="color" data-color="title_color" /><span>Título</span></label>
+          <label class="color-field"><input type="color" data-color="text_color" /><span>Texto</span></label>
+          <label class="color-field"><input type="color" data-color="icon_color" /><span>Iconos</span></label>
+          <label class="color-field"><input type="color" data-color="bg_color" /><span>Fondo</span></label>
+          <label class="color-field"><input type="color" data-color="border_color" /><span>Borde</span></label>
+          <label class="color-field"><input type="color" data-color="ring_color" /><span>Anillo</span></label>
+        </div>
+
+        <label class="switch"><input type="checkbox" id="gradient" /><span>Fondo con degradado</span></label>
+        <div class="gradient-fields" id="gradient-fields" hidden>
+          <label class="color-field"><input type="color" id="bg_color2" value="#c850c0" /><span>Color final</span></label>
+          <div class="range-field">
+            <div class="range-head"><label for="gradient_angle">Ángulo</label><output for="gradient_angle">35°</output></div>
+            <input type="range" id="gradient_angle" min="0" max="359" value="35" />
+          </div>
+        </div>
+
+        <div class="range-field">
+          <div class="range-head"><label for="border_radius">Radio del borde</label><output for="border_radius">14</output></div>
+          <input type="range" id="border_radius" data-param="border_radius" data-default="14" min="0" max="50" value="14" />
+        </div>
+      </section>
+    </aside>
+
   </main>
 
   <footer>

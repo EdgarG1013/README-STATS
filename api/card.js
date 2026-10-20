@@ -121,26 +121,47 @@ const graphqlRequest = async (query, variables) => {
 
   for (let i = 0; i < maxRetries; i++) {
     const currentToken = TOKENS.length > 0 ? getToken() : token;
+    let response;
     try {
-      const response = await fetch("https://api.github.com/graphql", {
+      response = await fetch("https://api.github.com/graphql", {
         method: "POST",
         headers: getHeaders(currentToken),
         body: JSON.stringify({ query, variables }),
+        signal: AbortSignal.timeout(10_000),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      if (data.errors) {
-        throw new Error(data.errors[0]?.message || "GraphQL error");
-      }
-      return data.data;
     } catch (err) {
+      // Network error or timeout: worth retrying with the next token.
       lastError = err;
-      console.error(`Attempt ${i + 1} failed:`, err.message);
+      console.error(`GitHub request attempt ${i + 1} failed:`, err.message);
+      continue;
     }
+
+    // Bad/expired token or rate limit on this token: try the next one.
+    if (response.status === 401 || response.status === 403 || response.status === 429) {
+      lastError = new CustomError(`GitHub responded ${response.status}`, "RATE_LIMITED");
+      console.error(`GitHub request attempt ${i + 1} failed: HTTP ${response.status}`);
+      continue;
+    }
+    if (!response.ok) {
+      lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.error(`GitHub request attempt ${i + 1} failed:`, lastError.message);
+      continue;
+    }
+
+    const data = await response.json();
+    if (data.errors?.length) {
+      const [firstError] = data.errors;
+      // A missing user is a definitive answer: no point retrying with other tokens.
+      if (firstError.type === "NOT_FOUND") {
+        throw new CustomError("User not found", "USER_NOT_FOUND");
+      }
+      if (firstError.type === "RATE_LIMITED") {
+        lastError = new CustomError("GitHub rate limit reached", "RATE_LIMITED");
+        continue;
+      }
+      throw new CustomError(firstError.message || "GraphQL error", "GRAPHQL_ERROR");
+    }
+    return data.data;
   }
   throw lastError;
 };
@@ -213,7 +234,6 @@ const fetchLanguages = async (username) => {
     }
   }
 
-  console.log("Languages found:", Object.keys(langMap).length);
   return langMap;
 };
 

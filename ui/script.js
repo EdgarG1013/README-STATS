@@ -1,27 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
   const $ = (id) => document.getElementById(id);
+  const $$ = (selector) => [...document.querySelectorAll(selector)];
 
   const usernameInput = $("username");
+  const userForm = $("user-form");
   const themeSearch = $("theme-search");
   const themeGrid = $("theme-grid");
   const themeCurrent = $("theme-current");
-  const tabs = document.querySelectorAll(".tab");
-  const formatTabs = document.querySelectorAll(".format-tab");
+  const tabs = $$(".tab");
+  const formatTabs = $$(".format-tab");
   const previewContainer = $("preview-container");
   const previewBody = $("preview-body");
-  const bgOptions = document.querySelectorAll(".bg-opt");
+  const bgOptions = $$(".bg-opt");
   const statusEl = $("status");
-  const userForm = $("user-form");
   const codeSection = $("code-section");
   const markdownCode = $("markdown-code");
   const copyCodeBtn = $("copy-code");
   const resetBtn = $("reset-btn");
-  const SUGGESTIONS = ["EdgarG1013", "torvalds", "gaearon", "sindresorhus"];
   const toast = $("toast");
-  const colorInputs = document.querySelectorAll(".color-grid input[type=color]");
-  const ranges = ["border_radius", "langs_count", "days"].map($);
+  const gradientToggle = $("gradient");
+  const gradientFields = $("gradient-fields");
+  const gradientEnd = $("bg_color2");
+  const gradientAngle = $("gradient_angle");
 
-  const DEFAULTS = { theme: "dracula", border_radius: "14", langs_count: "6", days: "31" };
+  // Controls that map 1:1 to a query param (checkboxes, ranges, text inputs).
+  const paramFields = $$(".controls [data-param]");
+  const colorInputs = $$("[data-color]");
+  const statRows = $$("[data-hide]");
+  const ranges = $$(".controls input[type=range]");
+
+  const DEFAULT_THEME = "dracula";
+  const SUGGESTIONS = ["EdgarG1013", "torvalds", "gaearon", "sindresorhus"];
   const CARD_LABELS = {
     stats: "GitHub Stats",
     languages: "Top Languages",
@@ -29,11 +38,19 @@ document.addEventListener("DOMContentLoaded", () => {
     contributions: "Contribution Graph",
     all: "GitHub Stats",
   };
+  const ERROR_MESSAGES = {
+    400: "Ese nombre de usuario no es válido en GitHub.",
+    404: (u) => `No se encontró el usuario "${u}".`,
+    429: "Demasiadas peticiones. Espera un minuto e inténtalo de nuevo.",
+    500: "El servidor no tiene un token de GitHub configurado (GITHUB_TOKEN).",
+    502: "No se pudieron obtener los datos de GitHub. Inténtalo de nuevo.",
+    503: "Se alcanzó el límite de la API de GitHub. Inténtalo más tarde.",
+  };
 
   const state = {
     card: "stats",
     format: "markdown",
-    theme: DEFAULTS.theme,
+    theme: DEFAULT_THEME,
     themes: {},
     colors: {}, // only colors the user explicitly changed
   };
@@ -46,29 +63,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const normalizeHex = (hex) => {
     if (!hex) return null;
-    hex = hex.replace("#", "");
+    hex = String(hex).replace("#", "");
     if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
     return /^[0-9a-f]{6}$/i.test(hex) ? `#${hex.toLowerCase()}` : null;
   };
 
+  // "35,4158d0,c850c0" -> { angle, stops: ["#4158d0", "#c850c0"] }
+  const parseGradient = (value) => {
+    const parts = String(value || "").split(",");
+    if (parts.length < 3) return null;
+    const stops = parts.slice(1).map(normalizeHex);
+    return stops.every(Boolean) ? { angle: Number(parts[0]) || 0, stops } : null;
+  };
+
+  // Same fallbacks the server applies (api/themes.cjs getCardColors).
+  function themeColor(theme, key) {
+    const gradient = key === "bg_color" && parseGradient(theme.bg_color);
+    if (gradient) return gradient.stops[0];
+    if (key === "ring_color") return normalizeHex(theme.ring_color || theme.title_color);
+    if (key === "border_color") return normalizeHex(theme.border_color || "e4e2e2");
+    return normalizeHex(theme[key]);
+  }
+
+  const inScope = (el, card = state.card) => {
+    const scope = el.closest("[data-only]");
+    return !scope || scope.dataset.only.split(" ").includes(card);
+  };
+
   function buildParams(card = state.card) {
     const params = new URLSearchParams({ username: usernameInput.value.trim() });
-    if (state.theme !== DEFAULTS.theme) params.set("theme", state.theme);
+    if (state.theme !== DEFAULT_THEME) params.set("theme", state.theme);
+
     for (const [key, value] of Object.entries(state.colors)) params.set(key, value.replace("#", ""));
 
-    const radius = $("border_radius").value;
-    if (radius !== DEFAULTS.border_radius) params.set("border_radius", radius);
-    if (["languages", "all"].includes(card) && $("langs_count").value !== DEFAULTS.langs_count) {
-      params.set("langs_count", $("langs_count").value);
+    if (gradientToggle.checked) {
+      const start = (state.colors.bg_color || themeColor(state.themes[state.theme] || {}, "bg_color") || "#151515").replace("#", "");
+      params.set("bg_color", `${gradientAngle.value},${start},${gradientEnd.value.replace("#", "")}`);
     }
-    if (["contributions", "all"].includes(card) && $("days").value !== DEFAULTS.days) {
-      params.set("days", $("days").value);
+
+    for (const el of paramFields) {
+      if (!inScope(el, card)) continue;
+      const name = el.dataset.param;
+      if (el.type === "checkbox") {
+        // data-invert: the checkbox reads "Ocultar X" but the param is show_x.
+        const invert = "invert" in el.dataset;
+        if (el.checked) params.set(name, String(!invert));
+      } else {
+        const value = el.value.trim();
+        if (value && value !== (el.dataset.default || "")) params.set(name, value);
+      }
     }
+
+    const hidden = statRows.filter((c) => !c.checked).map((c) => c.dataset.hide);
+    if (hidden.length && inScope(statRows[0], card)) params.set("hide", hidden.join(","));
+
     return params;
   }
 
   const cardUrl = (card = state.card) =>
-    `${window.location.origin}/api/card/${card}?${buildParams(card).toString()}`;
+    // Commas are valid in a query string; keeping them readable makes the README URL nicer.
+    `${window.location.origin}/api/card/${card}?${buildParams(card).toString().replace(/%2C/g, ",")}`;
 
   function showToast(message) {
     toast.textContent = message;
@@ -77,9 +131,16 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast.timer = setTimeout(() => toast.classList.remove("visible"), 1800);
   }
 
-  function setStatus(state, text) {
-    statusEl.dataset.state = state;
+  function setStatus(kind, text) {
+    statusEl.dataset.state = kind;
     statusEl.textContent = text;
+  }
+
+  function paintRange(input) {
+    const pct = ((input.value - input.min) / (input.max - input.min)) * 100;
+    input.style.setProperty("--fill", `${pct}%`);
+    const out = document.querySelector(`output[for="${input.id}"]`);
+    if (out) out.textContent = input.id === "gradient_angle" ? `${input.value}°` : input.value;
   }
 
   function showEmptyState() {
@@ -107,18 +168,15 @@ document.addEventListener("DOMContentLoaded", () => {
     setStatus("idle", "Esperando usuario");
   }
 
-  function setPlaceholder(message, isError = false) {
+  function showError(message) {
     const p = document.createElement("p");
-    p.className = "preview-placeholder" + (isError ? " error" : "");
+    p.className = "preview-placeholder error";
     p.textContent = message;
-    previewBody.replaceChildren(p);
-    if (isError) {
-      const retry = document.createElement("button");
-      retry.className = "btn small ghost";
-      retry.textContent = "Reintentar";
-      retry.addEventListener("click", generateCard);
-      previewBody.append(retry);
-    }
+    const retry = document.createElement("button");
+    retry.className = "btn small ghost";
+    retry.textContent = "Reintentar";
+    retry.addEventListener("click", generateCard);
+    previewBody.replaceChildren(p, retry);
   }
 
   // ---------- Themes ----------
@@ -130,13 +188,19 @@ document.addEventListener("DOMContentLoaded", () => {
     themeGrid.replaceChildren(
       ...names.map((name) => {
         const t = state.themes[name];
+        const gradient = parseGradient(t.bg_color);
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "theme-swatch" + (name === state.theme ? " active" : "");
         btn.setAttribute("role", "option");
         btn.setAttribute("aria-selected", name === state.theme);
         btn.title = name;
-        btn.style.setProperty("--sw-bg", normalizeHex(t.bg_color) || "#151515");
+        btn.style.setProperty(
+          "--sw-bg",
+          gradient
+            ? `linear-gradient(${gradient.angle + 90}deg, ${gradient.stops.join(", ")})`
+            : normalizeHex(t.bg_color) || "#151515",
+        );
         btn.style.setProperty("--sw-title", normalizeHex(t.title_color) || "#ffffff");
         btn.style.setProperty("--sw-icon", normalizeHex(t.icon_color) || "#79ff97");
         btn.style.setProperty("--sw-text", normalizeHex(t.text_color) || "#9f9f9f");
@@ -161,8 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function syncColorPickers() {
     const t = state.themes[state.theme] || {};
     colorInputs.forEach((input) => {
-      const key = input.dataset.param;
-      input.value = state.colors[key] || normalizeHex(t[key]) || "#000000";
+      const key = input.dataset.color;
+      input.value = state.colors[key] || themeColor(t, key) || "#000000";
       input.closest(".color-field").classList.toggle("dirty", key in state.colors);
     });
   }
@@ -181,9 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       state.themes = data.details || {};
     } catch {
-      state.themes = { [DEFAULTS.theme]: {} };
+      state.themes = { [DEFAULT_THEME]: {} };
     }
-    if (!state.themes[state.theme]) state.theme = Object.keys(state.themes)[0];
+    if (!state.themes[state.theme]) state.theme = DEFAULT_THEME in state.themes ? DEFAULT_THEME : Object.keys(state.themes)[0];
     themeCurrent.textContent = state.theme;
     renderThemeGrid();
     syncColorPickers();
@@ -199,6 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function generateCard() {
+    clearTimeout(debounceTimer);
     const username = usernameInput.value.trim();
     syncUrl();
     if (!username) {
@@ -211,19 +276,15 @@ document.addEventListener("DOMContentLoaded", () => {
     controller = new AbortController();
 
     setStatus("loading", "Generando…");
-    const hasImage = previewBody.querySelector("img");
-    if (hasImage) previewBody.classList.add("loading");
+    if (previewBody.querySelector("img")) previewBody.classList.add("loading");
     else previewBody.replaceChildren(Object.assign(document.createElement("div"), { className: "skeleton" }));
 
     try {
       const response = await fetch(cardUrl(), { signal: controller.signal });
       if (!response.ok) {
-        let msg = `HTTP ${response.status}`;
-        try {
-          const data = await response.json();
-          msg = data.error || data.secondaryMessage || msg;
-        } catch {}
-        throw new Error(msg);
+        const known = ERROR_MESSAGES[response.status];
+        const message = typeof known === "function" ? known(username) : known;
+        throw new Error(message || `Error inesperado (HTTP ${response.status}).`);
       }
 
       const blob = await response.blob();
@@ -242,15 +303,9 @@ document.addEventListener("DOMContentLoaded", () => {
       codeSection.hidden = false;
     } catch (error) {
       if (error.name === "AbortError") return;
-      const m = error.message.toLowerCase();
-      let message = error.message || "No se pudo cargar la tarjeta.";
-      if (m.includes("token")) message = "Token de GitHub no configurado. Define GITHUB_TOKEN en el archivo .env.";
-      else if (m.includes("404") || m.includes("not found") || m.includes("could not resolve")) {
-        message = `No se encontró el usuario "${username}".`;
-      }
       codeSection.hidden = true;
       setStatus("error", "Error");
-      setPlaceholder(message, true);
+      showError(error.message || "No se pudo cargar la tarjeta.");
       console.error(error);
     } finally {
       previewBody.classList.remove("loading");
@@ -266,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (state.format === "url") return url;
     if (state.format === "html") {
-      return `<p align="center">\n  <img src="${url}" alt="${label} de ${username}" />\n</p>`;
+      return `<p align="center">\n  <img src="${url.replace(/&/g, "&amp;")}" alt="${label} de ${username}" />\n</p>`;
     }
     return `![${label}](${url})`;
   }
@@ -302,17 +357,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (params.get("theme")) state.theme = params.get("theme");
 
     const card = params.get("card");
-    if (card && CARD_LABELS[card]) setActiveCard(card);
+    if (card && CARD_LABELS[card]) state.card = card;
 
-    ranges.forEach((input) => {
-      if (params.has(input.id)) input.value = params.get(input.id);
-      $(`${input.id}-value`).textContent = input.value;
-    });
+    for (const el of paramFields) {
+      const value = params.get(el.dataset.param);
+      if (value === null) continue;
+      if (el.type === "checkbox") el.checked = "invert" in el.dataset ? value === "false" : value === "true";
+      else el.value = value;
+    }
+
+    const hidden = (params.get("hide") || "").split(",");
+    statRows.forEach((c) => (c.checked = !hidden.includes(c.dataset.hide)));
 
     colorInputs.forEach((input) => {
-      const hex = normalizeHex(params.get(input.dataset.param));
-      if (hex) state.colors[input.dataset.param] = hex;
+      const key = input.dataset.color;
+      const value = params.get(key);
+      const gradient = key === "bg_color" && parseGradient(value);
+      if (gradient) {
+        gradientToggle.checked = true;
+        gradientAngle.value = gradient.angle;
+        gradientEnd.value = gradient.stops.at(-1);
+        state.colors.bg_color = gradient.stops[0];
+      } else if (normalizeHex(value)) {
+        state.colors[key] = normalizeHex(value);
+      }
     });
+    gradientFields.hidden = !gradientToggle.checked;
   }
 
   // ---------- Controls ----------
@@ -324,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
       t.classList.toggle("active", active);
       t.setAttribute("aria-selected", active);
     });
-    document.querySelectorAll("[data-only]").forEach((el) => {
+    $$("[data-only]").forEach((el) => {
       el.hidden = !el.dataset.only.split(" ").includes(card);
     });
   }
@@ -347,28 +417,39 @@ document.addEventListener("DOMContentLoaded", () => {
   usernameInput.addEventListener("input", () => scheduleGenerate(600));
   userForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    scheduleGenerate(0);
+    generateCard();
   });
 
   themeSearch.addEventListener("input", renderThemeGrid);
 
-  ranges.forEach((input) =>
-    input.addEventListener("input", () => {
-      $(`${input.id}-value`).textContent = input.value;
-      scheduleGenerate();
-    }),
-  );
+  ranges.forEach((input) => input.addEventListener("input", () => paintRange(input)));
+
+  // Any option change regenerates the preview (text fields wait a bit longer).
+  $$(".controls input").forEach((input) => {
+    if (input === themeSearch || input.type === "color") return;
+    input.addEventListener("input", () => scheduleGenerate(input.type === "text" ? 700 : 350));
+  });
 
   colorInputs.forEach((input) =>
     input.addEventListener("input", () => {
-      state.colors[input.dataset.param] = input.value;
+      state.colors[input.dataset.color] = input.value;
       input.closest(".color-field").classList.add("dirty");
       scheduleGenerate();
     }),
   );
 
+  gradientEnd.addEventListener("input", () => scheduleGenerate());
+  gradientToggle.addEventListener("change", () => {
+    gradientFields.hidden = !gradientToggle.checked;
+  });
+
   resetBtn.addEventListener("click", () => {
     state.colors = {};
+    gradientToggle.checked = false;
+    gradientFields.hidden = true;
+    const radius = $("border_radius");
+    radius.value = radius.dataset.default;
+    paintRange(radius);
     syncColorPickers();
     scheduleGenerate(0);
   });
@@ -384,6 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   restoreFromUrl();
   setActiveCard(state.card);
+  ranges.forEach(paintRange);
   showEmptyState();
   loadThemes().then(() => {
     if (usernameInput.value.trim()) generateCard();

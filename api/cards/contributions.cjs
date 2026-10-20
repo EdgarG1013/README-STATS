@@ -1,15 +1,7 @@
-const { getCardColors } = require('../themes.cjs');
+const { escapeXml, resolveColors, cardFrame, cardTitle } = require('./common.cjs');
 
 function renderContributionsCard(username, contributionDays, theme) {
-  const colors = getCardColors({
-    title_color: theme.title_color,
-    text_color: theme.text_color,
-    icon_color: theme.icon_color,
-    bg_color: theme.bg_color,
-    border_color: theme.border_color,
-    ring_color: theme.ring_color,
-    theme: theme.themeName,
-  });
+  const colors = resolveColors(theme);
 
   if (!contributionDays || contributionDays.length === 0) {
     contributionDays = [{ date: new Date().toISOString().split('T')[0], count: 0 }];
@@ -17,7 +9,6 @@ function renderContributionsCard(username, contributionDays, theme) {
 
   const width = 650;
   const height = 320;
-  const border_radius = theme.border_radius != null ? theme.border_radius : 14;
   const padding = { top: 60, right: 35, bottom: 55, left: 60 };
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
@@ -94,10 +85,9 @@ function renderContributionsCard(username, contributionDays, theme) {
     </linearGradient>
   </defs>
 
-  <rect x="0" y="0" rx="${border_radius}" width="${width}" height="${height}"
-    fill="${colors.bgColor}" stroke="${colors.borderColor}" stroke-width="1" />
+  ${cardFrame({ width, height, colors, theme })}
 
-  <text data-testid="card-title" x="${width / 2}" y="34" class="header" text-anchor="middle">${escapeXml(username)}'s Contribution Graph</text>
+  ${cardTitle(`${username}'s Contribution Graph`, theme, `x="${width / 2}" y="34" text-anchor="middle"`)}
 
   ${gridLines.join('\n  ')}
 
@@ -114,15 +104,6 @@ function renderContributionsCard(username, contributionDays, theme) {
 </svg>`;
 
   return svg;
-}
-
-function escapeXml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
 }
 
 module.exports = { renderContributionsCard };
