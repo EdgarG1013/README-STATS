@@ -84,8 +84,11 @@ app.use("/api", cors({ methods: ["GET"] }));
 app.use(
   "/static",
   express.static(path.join(ROOT_DIR, "ui"), {
-    maxAge: "1h",
-    setHeaders: (res) => res.setHeader("Content-Security-Policy", UI_CSP),
+    // Revalidate on every load (cheap 304 via ETag) so new deploys are never served stale.
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Content-Security-Policy", UI_CSP);
+    },
   }),
 );
 

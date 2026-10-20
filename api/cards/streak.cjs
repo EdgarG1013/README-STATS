@@ -1,7 +1,18 @@
-const { resolveColors, cardFrame } = require('./common.cjs');
+const { escapeXml, resolveColors, cardFrame } = require('./common.cjs');
+const { translator, formatNumber } = require('./i18n.cjs');
+
+// Flame icon (Material "whatshot"), drawn centered on (0, 0) at ~16x22px.
+const FIRE_PATH =
+  'M 1.5 -10.33 C 1.5 -10.33 2.24 -7.68 2.24 -5.53 C 2.24 -3.47 0.89 -1.8 -1.17 -1.8 ' +
+  'C -3.23 -1.8 -4.79 -3.47 -4.79 -5.53 L -4.76 -5.89 C -6.78 -3.49 -8 -0.38 -8 3 ' +
+  'C -8 7.42 -4.42 11 0 11 C 4.42 11 8 7.42 8 3 C 8 -2.39 5.41 -7.2 1.5 -10.33 Z ' +
+  'M -0.29 8 C -2.07 8 -3.51 6.6 -3.51 4.86 C -3.51 3.24 -2.46 2.1 -0.7 1.74 ' +
+  'C 1.07 1.38 2.9 0.53 3.92 -0.84 C 4.31 0.45 4.51 1.81 4.51 3.2 C 4.51 5.85 2.36 8 -0.29 8 Z';
 
 function renderStreakCard(streakData, theme) {
   const colors = resolveColors(theme);
+  const locale = theme.locale || 'en';
+  const t = translator(locale);
 
   const {
     totalContributions,
@@ -14,99 +25,80 @@ function renderStreakCard(streakData, theme) {
     contributionsSince,
   } = streakData;
 
+  const thisYear = new Date().getFullYear();
+  // "Aug 12" for dates in the current year, "Aug 4, 2025" otherwise.
   const formatDate = (dateStr) => {
-    if (!dateStr) return 'N/A';
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (!dateStr) return '';
+    const d = new Date(`${dateStr}T00:00:00Z`);
+    const opts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+    if (d.getUTCFullYear() !== thisYear) opts.year = 'numeric';
+    return d.toLocaleDateString(locale, opts);
+  };
+  const range = (start, end) => {
+    if (!start) return '';
+    return start === end ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`;
   };
 
-  const currentRange = streakStart && streakEnd
-    ? `${formatDate(streakStart)} - ${formatDate(streakEnd)}`
-    : 'N/A';
-  const longestRange = longestStreakStart && longestStreakEnd
-    ? `${formatDate(longestStreakStart)} - ${formatDate(longestStreakEnd)}`
-    : currentRange;
-  const totalRange = contributionsSince
-    ? `${formatDate(contributionsSince)} - Present`
-    : 'Past year';
+  const totalRange = contributionsSince ? `${formatDate(contributionsSince)} - ${t('present')}` : '';
+  const currentRange = currentStreak > 0 ? range(streakStart, streakEnd) : '';
+  const longestRange = longestStreak > 0 ? range(longestStreakStart || streakStart, longestStreakEnd || streakEnd) : '';
 
   const width = 495;
   const height = 195;
-  const paddingX = 25;
-  const paddingY = 30;
+  const col = width / 3;
+  const leftX = col / 2;
+  const midX = width / 2;
+  const rightX = width - col / 2;
 
-  const ringRadius = 38;
-  const circumference = 2 * Math.PI * ringRadius;
-  const ringPct = Math.min(currentStreak / Math.max(longestStreak, 1), 1);
-  const ringOffset = circumference * (1 - ringPct);
+  const ringY = 71;
+  const ringR = 40;
+  const fireY = ringY - ringR;
 
-  const col1X = paddingX + 72;
-  const col2X = width / 2;
-  const col3X = width - paddingX - 72;
-  const dividerTop = paddingY + 5;
-  const dividerBottom = height - paddingY - 5;
+  const sideColumn = (x, value, label, dates) => `
+  <g transform="translate(${x}, 0)">
+    <text x="0" y="88" class="stat-big" text-anchor="middle">${formatNumber(value, locale)}</text>
+    <text x="0" y="122" class="stat-label" text-anchor="middle">${escapeXml(label)}</text>
+    ${dates ? `<text x="0" y="148" class="stat-date" text-anchor="middle">${escapeXml(dates)}</text>` : ''}
+  </g>`;
 
-  const svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg">
   <style>
-    .stat-big {
-      font: 800 32px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.iconColor};
-    }
-    .stat-label {
-      font: 600 12px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.titleColor};
-    }
-    .stat-date {
-      font: 400 11px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.textColor};
-      opacity: 0.85;
-    }
-    .rank-text {
-      font: 800 26px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif;
-      fill: ${colors.iconColor};
-    }
-
-    .rank-circle {
-      stroke: ${colors.ringColor};
-      stroke-dasharray: ${circumference};
-      stroke-width: 6;
-      stroke-linecap: round;
-    }
-    .rank-circle-rim {
-      stroke: ${colors.ringColor};
-      stroke-width: 6;
-      opacity: 0.2;
-    }
+    .stat-big { font: 700 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${colors.textColor}; }
+    .stat-label { font: 400 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${colors.textColor}; }
+    .stat-date { font: 400 12px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${colors.textColor}; opacity: 0.85; }
+    .streak-num { font: 700 28px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${colors.ringColor}; }
+    .streak-label { font: 400 14px 'Segoe UI', Ubuntu, "Helvetica Neue", Sans-Serif; fill: ${colors.ringColor}; }
   </style>
+
+  <defs>
+    <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Cuts a gap in the ring behind the flame, so it works on solid and gradient backgrounds -->
+    <mask id="ringMask">
+      <rect width="${width}" height="${height}" fill="white"/>
+      <circle cx="${midX}" cy="${fireY}" r="13" fill="black"/>
+    </mask>
+  </defs>
 
   ${cardFrame({ width, height, colors, theme })}
 
-  <!-- Divider lines -->
-  <line x1="${col2X - 50}" y1="${dividerTop}" x2="${col2X - 50}" y2="${dividerBottom}" stroke="${colors.borderColor}" stroke-width="1"/>
-  <line x1="${col2X + 50}" y1="${dividerTop}" x2="${col2X + 50}" y2="${dividerBottom}" stroke="${colors.borderColor}" stroke-width="1"/>
+  <line x1="${col}" y1="28" x2="${col}" y2="${height - 28}" stroke="${colors.textColor}" stroke-opacity="0.35" stroke-width="1"/>
+  <line x1="${col * 2}" y1="28" x2="${col * 2}" y2="${height - 28}" stroke="${colors.textColor}" stroke-opacity="0.35" stroke-width="1"/>
 
-  <!-- Total Contributions -->
-  <text x="${col1X}" y="${paddingY + 45}" class="stat-big" text-anchor="middle">${Number(totalContributions).toLocaleString()}</text>
-  <text x="${col1X}" y="${paddingY + 70}" class="stat-label" text-anchor="middle">Total Contributions</text>
-  <text x="${col1X}" y="${paddingY + 88}" class="stat-date" text-anchor="middle">${totalRange}</text>
+  ${sideColumn(leftX, totalContributions, t('totalContributions'), totalRange)}
 
-  <!-- Current Streak -->
-  <g transform="translate(${col2X}, ${paddingY + 42})">
-    <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle-rim"/>
-    <circle cx="0" cy="0" r="${ringRadius}" fill="none" class="rank-circle"
-      stroke-dashoffset="${ringOffset}" transform="rotate(-90)"/>
-    <text x="0" y="8" class="rank-text" text-anchor="middle">${currentStreak}</text>
+  <g mask="url(#ringMask)">
+    <circle cx="${midX}" cy="${ringY}" r="${ringR}" stroke="${colors.ringColor}" stroke-width="5" fill="none" filter="url(#ringGlow)"/>
   </g>
-  <text x="${col2X}" y="${paddingY + 100}" class="stat-label" text-anchor="middle">Current Streak</text>
-  <text x="${col2X}" y="${paddingY + 118}" class="stat-date" text-anchor="middle">${currentRange}</text>
+  <path transform="translate(${midX}, ${fireY})" d="${FIRE_PATH}" fill="${colors.ringColor}" filter="url(#ringGlow)"/>
+  <text x="${midX}" y="${ringY + 10}" class="streak-num" text-anchor="middle">${formatNumber(currentStreak, locale)}</text>
+  <text x="${midX}" y="${ringY + ringR + 25}" class="streak-label" text-anchor="middle">${escapeXml(t('currentStreak'))}</text>
+  ${currentRange ? `<text x="${midX}" y="${ringY + ringR + 48}" class="stat-date" text-anchor="middle">${escapeXml(currentRange)}</text>` : ''}
 
-  <!-- Longest Streak -->
-  <text x="${col3X}" y="${paddingY + 45}" class="stat-big" text-anchor="middle">${longestStreak}</text>
-  <text x="${col3X}" y="${paddingY + 70}" class="stat-label" text-anchor="middle">Longest Streak</text>
-  <text x="${col3X}" y="${paddingY + 88}" class="stat-date" text-anchor="middle">${longestRange}</text>
+  ${sideColumn(rightX, longestStreak, t('longestStreak'), longestRange)}
 </svg>`;
-
-  return svg;
 }
 
 module.exports = { renderStreakCard };

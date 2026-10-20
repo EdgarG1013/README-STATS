@@ -252,6 +252,7 @@ Parámetros comunes a **todas** las tarjetas:
 | `hide_border`   | boolean | `true` para ocultar el borde                               | `false`     |
 | `hide_title`    | boolean | `true` para ocultar el título (stats, languages, contributions) | `false` |
 | `custom_title`  | string  | Título propio (máx. 60 caracteres)                         | según tarjeta |
+| `locale`        | string  | Idioma de los textos: `en`, `es`, `pt`, `fr`, `de`, `it` (Commits, PRs e Issues no se traducen) | `en` |
 
 `bg_color` también acepta un **degradado** con el formato `ángulo,color1,color2[,…]` (de 2 a 5 colores), por ejemplo `bg_color=35,4158d0,c850c0,ffcc70`.
 

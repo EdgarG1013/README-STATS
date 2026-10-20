@@ -1,7 +1,9 @@
 const { escapeXml, resolveColors, cardFrame, cardTitle } = require('./common.cjs');
+const { translator } = require('./i18n.cjs');
 
 function renderContributionsCard(username, contributionDays, theme) {
   const colors = resolveColors(theme);
+  const t = translator(theme.locale);
 
   if (!contributionDays || contributionDays.length === 0) {
     contributionDays = [{ date: new Date().toISOString().split('T')[0], count: 0 }];
@@ -87,11 +89,11 @@ function renderContributionsCard(username, contributionDays, theme) {
 
   ${cardFrame({ width, height, colors, theme })}
 
-  ${cardTitle(`${username}'s Contribution Graph`, theme, `x="${width / 2}" y="34" text-anchor="middle"`)}
+  ${cardTitle(t('contributionsTitle', { name: username }), theme, `x="${width / 2}" y="34" text-anchor="middle"`)}
 
   ${gridLines.join('\n  ')}
 
-  <text x="20" y="${padding.top + chartH / 2}" class="axis-title" text-anchor="middle" transform="rotate(-90, 20, ${padding.top + chartH / 2})">Contributions</text>
+  <text x="20" y="${padding.top + chartH / 2}" class="axis-title" text-anchor="middle" transform="rotate(-90, 20, ${padding.top + chartH / 2})">${escapeXml(t('contributionsAxis'))}</text>
 
   <path d="${fillPathD}" fill="url(#contribFill)"/>
   <path d="${pathD}" fill="none" stroke="${colors.iconColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -100,7 +102,7 @@ function renderContributionsCard(username, contributionDays, theme) {
 
   ${xLabels.join('\n  ')}
 
-  <text x="${width / 2}" y="${height - 12}" class="axis-title" text-anchor="middle">Days</text>
+  <text x="${width / 2}" y="${height - 12}" class="axis-title" text-anchor="middle">${escapeXml(t('daysAxis'))}</text>
 </svg>`;
 
   return svg;

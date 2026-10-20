@@ -1,4 +1,5 @@
 const { escapeXml, resolveColors, cardFrame, cardTitle } = require('./common.cjs');
+const { translator, formatNumber } = require('./i18n.cjs');
 
 function calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contributedTo }) {
   const COMMITS_MEDIAN = 1000;
@@ -43,6 +44,8 @@ function renderStatsCard(data, theme) {
   const { name, totalStars, totalCommits, totalPRs, totalIssues, contributedTo } = data;
 
   const colors = resolveColors(theme);
+  const locale = theme.locale || 'en';
+  const t = translator(locale);
 
   const rank = calculateRank({ totalCommits, totalPRs, totalIssues, totalStars, contributedTo });
 
@@ -66,12 +69,16 @@ function renderStatsCard(data, theme) {
   ];
 
   const rows = [
-    ['stars', 'Total Stars Earned:', totalStars, icons[0]],
-    ['commits', 'Total Commits (last year):', totalCommits, icons[1]],
-    ['prs', 'Total PRs:', totalPRs, icons[2]],
-    ['issues', 'Total Issues:', totalIssues, icons[3]],
-    ['contribs', 'Contributed to (last year):', contributedTo, icons[4]],
+    ['stars', t('stars'), totalStars, icons[0]],
+    ['commits', t('commits'), totalCommits, icons[1]],
+    ['prs', t('prs'), totalPRs, icons[2]],
+    ['issues', t('issues'), totalIssues, icons[3]],
+    ['contribs', t('contribs'), contributedTo, icons[4]],
   ].filter(([key]) => !hidden.has(key));
+
+  // Values start after the longest label (~7.6px per char at 14px bold), never before x=235.
+  const longestLabel = Math.max(...rows.map(([, label]) => label.length), 0);
+  const valueOffset = Math.max(235, Math.ceil(longestLabel * 7.6) + 16);
 
   const rowsSvg = rows
     .map(([, label, value, icon], i) => {
@@ -80,8 +87,8 @@ function renderStatsCard(data, theme) {
       return `
       <g transform="translate(${paddingX}, 0)">
         ${showIcons ? `<g transform="translate(0, ${y - 11})">${icon}</g>` : ''}
-        <text class="stat" x="${textX}" y="${y}">${label}</text>
-        <text class="stat" x="${textX + 235}" y="${y}">${Number(value).toLocaleString()}</text>
+        <text class="stat" x="${textX}" y="${y}">${escapeXml(label)}</text>
+        <text class="stat" x="${textX + valueOffset}" y="${y}">${formatNumber(value, locale)}</text>
       </g>`;
     })
     .join('');
@@ -126,7 +133,7 @@ function renderStatsCard(data, theme) {
 
   ${cardFrame({ width, height, colors, theme })}
 
-  ${cardTitle(`${name}'s GitHub Stats`, theme, `x="${paddingX}" y="${paddingY}"`)}
+  ${cardTitle(t('statsTitle', { name }), theme, `x="${paddingX}" y="${paddingY}"`)}
 
   ${rowsSvg}
 

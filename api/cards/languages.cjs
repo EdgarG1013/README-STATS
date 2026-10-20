@@ -1,4 +1,5 @@
 const { escapeXml, resolveColors, cardFrame, cardTitle } = require('./common.cjs');
+const { translator } = require('./i18n.cjs');
 
 const langColors = {
   TypeScript: '#3178c6',
@@ -76,7 +77,7 @@ function renderLanguagesCard(languages, theme) {
     const lx = paddingX + col * colWidth;
     const ly = legendStartY + row * 24;
     const color = langColors[lang.name] || lang.color || defaultBarColors[i % defaultBarColors.length];
-    const pct = ((lang.size / total) * 100).toFixed(2);
+    const pct = ((lang.size / total) * 100).toLocaleString(theme.locale || 'en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     legendItems += `
     <circle cx="${lx + 5}" cy="${ly - 4}" r="5" fill="${color}"/>
@@ -97,7 +98,7 @@ function renderLanguagesCard(languages, theme) {
 
   ${cardFrame({ width, height, colors, theme })}
 
-  ${cardTitle('Most Used Languages', theme, `x="${paddingX}" y="${paddingY}"`)}
+  ${cardTitle(translator(theme.locale)('languagesTitle'), theme, `x="${paddingX}" y="${paddingY}"`)}
 
   ${barMask}
   <g mask="url(#barMask)">

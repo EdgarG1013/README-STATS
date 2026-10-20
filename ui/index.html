@@ -102,6 +102,19 @@
           <span class="step-label"><b>03</b> Contenido</span>
         </div>
 
+        <div class="text-field">
+          <span class="field-label" id="locale-label">Idioma de la tarjeta</span>
+          <input type="hidden" id="locale" data-param="locale" data-default="en" value="en" />
+          <div class="segmented" role="radiogroup" aria-labelledby="locale-label">
+            <button type="button" role="radio" data-locale="en" title="English">EN</button>
+            <button type="button" role="radio" data-locale="es" title="Español">ES</button>
+            <button type="button" role="radio" data-locale="pt" title="Português">PT</button>
+            <button type="button" role="radio" data-locale="fr" title="Français">FR</button>
+            <button type="button" role="radio" data-locale="de" title="Deutsch">DE</button>
+            <button type="button" role="radio" data-locale="it" title="Italiano">IT</button>
+          </div>
+        </div>
+
         <div class="text-field" data-only="stats languages contributions">
           <label for="custom_title">Título personalizado</label>
           <input type="text" id="custom_title" data-param="custom_title" maxlength="60" placeholder="Por defecto según la tarjeta" />

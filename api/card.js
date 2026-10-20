@@ -318,49 +318,37 @@ const fetchStreakData = async (username) => {
   const calendar = data.user.contributionsCollection.contributionCalendar;
   const allDays = calendar.weeks.flatMap((week) => week.contributionDays);
 
-  let currentStreak = 0;
+  // Longest streak: the longest run of consecutive days with contributions.
   let longestStreak = 0;
-  let tempStreak = 0;
-  let currentStreakStart = null;
-  let currentStreakEnd = null;
   let longestStreakStart = null;
   let longestStreakEnd = null;
-  let tempStart = null;
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Calculate from most recent day backwards
-  for (let i = allDays.length - 1; i >= 0; i--) {
-    const day = allDays[i];
-    const date = new Date(day.date);
-
+  let runLength = 0;
+  let runStart = null;
+  for (const day of allDays) {
     if (day.contributionCount > 0) {
-      tempStreak++;
-      if (!tempStart) tempStart = day.date;
-      currentStreakEnd = day.date;
-    } else {
-      if (tempStreak > 0 && !currentStreakStart) {
-        currentStreak = tempStreak;
-        currentStreakStart = tempStart;
-        longestStreak = tempStreak;
-        longestStreakStart = tempStart;
-        longestStreakEnd = currentStreakEnd;
+      if (runLength === 0) runStart = day.date;
+      runLength++;
+      if (runLength > longestStreak) {
+        longestStreak = runLength;
+        longestStreakStart = runStart;
+        longestStreakEnd = day.date;
       }
-      tempStreak = 0;
-      tempStart = null;
+    } else {
+      runLength = 0;
     }
   }
 
-  // Handle case where streak is ongoing
-  if (tempStreak > 0 && !currentStreakStart) {
-    currentStreak = tempStreak;
-    currentStreakStart = tempStart;
-    if (tempStreak > longestStreak) {
-      longestStreak = tempStreak;
-      longestStreakStart = tempStart;
-      longestStreakEnd = currentStreakEnd;
-    }
+  // Current streak: consecutive days ending today. Today not having contributions yet
+  // does not break the streak (same rule GitHub streak cards use).
+  let currentStreak = 0;
+  let currentStreakStart = null;
+  let currentStreakEnd = null;
+  let i = allDays.length - 1;
+  if (i >= 0 && allDays[i].contributionCount === 0) i--;
+  for (; i >= 0 && allDays[i].contributionCount > 0; i--) {
+    if (currentStreak === 0) currentStreakEnd = allDays[i].date;
+    currentStreakStart = allDays[i].date;
+    currentStreak++;
   }
 
   return {

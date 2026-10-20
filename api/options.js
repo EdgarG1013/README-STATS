@@ -6,6 +6,7 @@ const HEX_RE = /^(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const USERNAME_RE = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
 
 const STATS_ROWS = ["stars", "commits", "prs", "issues", "contribs"];
+const LOCALES = ["en", "es", "pt", "fr", "de", "it"]; // keep in sync with api/cards/i18n.cjs
 
 // Express turns repeated params (?a=1&a=2) into arrays; only the first value counts.
 const first = (value) => (Array.isArray(value) ? value[0] : value);
@@ -88,6 +89,7 @@ export function parseCardOptions(query, catalog) {
     hide_border: bool(query.hide_border),
     hide_title: bool(query.hide_title),
     custom_title: text(query.custom_title),
+    locale: LOCALES.includes(first(query.locale)) ? first(query.locale) : "en",
     // Stats card
     // hide_icons is the documented legacy name; show_icons matches github-readme-stats.
     show_icons: bool(query.show_icons, !bool(query.hide_icons)),

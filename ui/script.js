@@ -22,6 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const gradientFields = $("gradient-fields");
   const gradientEnd = $("bg_color2");
   const gradientAngle = $("gradient_angle");
+  const localeInput = $("locale");
+  const localeButtons = $$("[data-locale]");
 
   // Controls that map 1:1 to a query param (checkboxes, ranges, text inputs).
   const paramFields = $$(".controls [data-param]");
@@ -425,6 +427,23 @@ document.addEventListener("DOMContentLoaded", () => {
   ranges.forEach((input) => input.addEventListener("input", () => paintRange(input)));
 
   // Any option change regenerates the preview (text fields wait a bit longer).
+  function syncLocaleButtons() {
+    localeButtons.forEach((b) => {
+      const active = b.dataset.locale === localeInput.value;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-checked", active);
+    });
+  }
+
+  localeButtons.forEach((btn) =>
+    btn.addEventListener("click", () => {
+      if (localeInput.value === btn.dataset.locale) return;
+      localeInput.value = btn.dataset.locale;
+      syncLocaleButtons();
+      generateCard();
+    }),
+  );
+
   $$(".controls input").forEach((input) => {
     if (input === themeSearch || input.type === "color") return;
     input.addEventListener("input", () => scheduleGenerate(input.type === "text" ? 700 : 350));
@@ -464,6 +483,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Init ----------
 
   restoreFromUrl();
+  syncLocaleButtons();
   setActiveCard(state.card);
   ranges.forEach(paintRange);
   showEmptyState();
